@@ -46,7 +46,7 @@ class empleadoApi extends Empleado implements IApiUsable{
 
  	public function TraerUno($request, $response, $args) {
      	$mail = $args['mail'];
-		$elempleado = Empleado::TraerUnEmpleado($mail);
+		$elEmpleado = Empleado::TraerUnEmpleado($mail);
 		
 		$newResponse = $response;
 		
