@@ -3,7 +3,7 @@ require_once "./clases/entidades/empleado.php";
 require_once "./clases/AutentificadorJWT.php";
 require_once ('./clases/entidades/IApiUsable.php');
 //var_dump(scandir("./clases")); //para ver donde estoy parado
-session_start();
+//session_start();
 
 class empleadoApi extends Empleado implements IApiUsable{
 
@@ -171,32 +171,39 @@ class empleadoApi extends Empleado implements IApiUsable{
 	}*/
 
     public function BorrarUno($request, $response, $args) {
-		$tokenAuth = $request->getHeader('Authorization');
-		$tokenAuth = $tokenAuth[0];
+		//$tokenAuth = $request->getHeader('Authorization');
+		//$tokenAuth = $tokenAuth[0];
 		$newResponse = $response;
 		 
-		if ($_SESSION["user"] == $tokenAuth && $_SESSION["lvl"]==0) {
+		//if ($_SESSION["user"] == $tokenAuth && $_SESSION["lvl"]==0) {
 			$ArrayDeParametros = $request->getParsedBody();
-			$id=$ArrayDeParametros['id'];
-			
-			$empleado= new empleado();
-			$empleado->id=$id;
-			
-			$cantidadDeBorrados=$empleado->Borrarempleado();
+			$id = $ArrayDeParametros['id'];
 
-			if($cantidadDeBorrados>0){
-				$newResponse = $newResponse->withAddedHeader('alertType', "success");
-				$rta = "Elementos borrados: ".$cantidadDeBorrados;
-			}
-			else {
+			if(empty(Empleado::TraerUnEmpleadoPorId($id))){
+				//no hay empleado
 				$newResponse = $newResponse->withAddedHeader('alertType', "danger");
-				$rta = "No se borró nada";	
+				$rta = "No se encontró ese empleado";
+			} else {
+				//hay empleado
+				$empleado = new empleado();
+				$empleado->id = $id;
+				
+				$cantidadDeBorrados = $empleado->Borrarempleado();
+	
+				if($cantidadDeBorrados>0) {
+					$newResponse = $newResponse->withAddedHeader('alertType', "success");
+					$rta = "Elementos borrados: ".$cantidadDeBorrados;
+				} else {
+					$newResponse = $newResponse->withAddedHeader('alertType', "danger");
+					$rta = "No se puedo borrar empleado";	
+				}
 			}
-		} else {
+			
+		/*} else {
 			$newResponse = $newResponse->withAddedHeader('alertType', "danger");
 			$newResponse = $newResponse->withStatus(401);
 			$rta = "No tiene permiso para borrar";	
-		}	
+		}*/	
 
 		$newResponse->getBody()->write($rta);
 		return $newResponse;

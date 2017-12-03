@@ -19,7 +19,15 @@ $app = new \Slim\App([
 
 $app->options('/{routes:.+}', function ($request, $response, $args) {
   return $response;
-})->add(\MWparaCORS::class . ':HabilitarCORSTodos');
+});
+
+$app->add(function ($req, $res, $next) {
+  $response = $next($req, $res);
+  return $response
+          ->withHeader('Access-Control-Allow-Origin', '*')
+          ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+          ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+});
 
 /*empleado*/
 $app->group('/empleado', function () {
@@ -30,7 +38,7 @@ $app->group('/empleado', function () {
  
    $this->post('/', \empleadoApi::class . ':CargarUno');
  
-   $this->delete('/', \empleadoApi::class . ':BorrarUno');
+   $this->delete('/', \empleadoApi::class . ':BorrarUno')->add(\MWparaCORS::class . ':HabilitarCORSTodos');
  
    $this->put('/', \empleadoApi::class . ':ModificarUno');
  
@@ -58,6 +66,5 @@ $app->get('/hola', function (Request $request, Response $response) {
 
     return $response;
 });
-
 
 $app->run();
