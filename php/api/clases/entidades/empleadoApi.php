@@ -75,7 +75,8 @@ class empleadoApi extends Empleado implements IApiUsable{
 
 		$newResponse = $response;
 
-		if (!array_key_exists('nombre', $ArrayDeParametros) 
+		if ($ArrayDeParametros == null
+		or !array_key_exists('nombre', $ArrayDeParametros) 
 		or !array_key_exists('apellido', $ArrayDeParametros) 
 		or !array_key_exists('clave', $ArrayDeParametros) 
 		or !array_key_exists('mail', $ArrayDeParametros) 
@@ -123,7 +124,8 @@ class empleadoApi extends Empleado implements IApiUsable{
 				$miempleado->setClave($ArrayDeParametros['clave']);
 				
 				$newResponse = $newResponse->withAddedHeader('alertType', "success");
-				$rta = $miempleado->Guardarempleado();
+
+				$rta = $miempleado->GuardarEmpleado();
 			}	
 		}
 		$newResponse->getBody()->write($rta);

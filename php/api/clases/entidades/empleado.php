@@ -90,7 +90,7 @@ class Empleado{
             :apellido,
             :clave,
             :mail,
-            :turno
+            :turno,
             :perfil,
             :fecha_creacion,
             :foto
