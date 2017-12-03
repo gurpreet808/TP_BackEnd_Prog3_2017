@@ -1,7 +1,8 @@
 <?php
-require_once "../clases/empleado.php";
-require_once "../clases/autentificadorjwt.php";
-require_once ('./APIclases/IApiUsable.php');
+require_once "./clases/entidades/empleado.php";
+require_once "./clases/AutentificadorJWT.php";
+require_once ('./clases/entidades/IApiUsable.php');
+//var_dump(scandir("./clases")); //para ver donde estoy parado
 session_start();
 
 class empleadoApi extends Empleado implements IApiUsable{
