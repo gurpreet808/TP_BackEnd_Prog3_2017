@@ -24,7 +24,7 @@ $app->options('/{routes:.+}', function ($request, $response, $args) {
 /*empleado*/
 $app->group('/empleado', function () {
   
-   $this->get('/', \empleadoApi::class . ':traerTodos')->add(\MWparaCORS::class . ':HabilitarCORSTodos');
+   $this->get('/', \empleadoApi::class . ':LlenarBBDD')->add(\MWparaCORS::class . ':HabilitarCORSTodos');
   
    $this->get('/{username}', \empleadoApi::class . ':traerUno')->add(\MWparaCORS::class . ':HabilitarCORSTodos');
  

@@ -36,10 +36,10 @@ class empleadoApi extends Empleado implements IApiUsable{
 	
 	public function LlenarBBDD(){
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
-		$consulta =$objetoAccesoDato->RetornarConsulta("INSERT INTO empleados (nombre,apellido,clave,mail,turno,perfil,fecha_creacion,foto)
+		$consulta =$objetoAccesoDato->RetornarConsulta("INSERT INTO empleados (nombre,apellido,clave,mail,turno,perfil,fecha_creacion)
 	 		values
 			 ('Administrador','Administrator','admin','admin@admin.com','mañana','admin','15/11/16'), 
-			 ('empleado','User','user','user@user.com','tarde','user','24/12/16')");
+			 ('Empleado','User','user','user@user.com','tarde','user','24/12/16')");
 	
 		return $consulta->execute();
 	}
