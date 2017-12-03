@@ -5,6 +5,57 @@ require_once ('./APIclases/IApiUsable.php');
 session_start();
 
 class usuarioApi extends Usuario implements IApiUsable{
+
+	public function CheckBBDD($request, $response, $next) {
+		$newResponse = $response;
+
+		try {
+			Empleado::TraerTodasLosEmpleados();
+			$newResponse = $next($request, $response);
+			
+		} catch (Exception $e) {
+			$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
+			$consulta =$objetoAccesoDato->RetornarConsulta("CREATE TABLE `empleados` (
+				`id` INT NOT NULL AUTO_INCREMENT, 
+				`nombre` VARCHAR(45) NOT NULL, 
+				`apellido` VARCHAR(45) NOT NULL, 
+				`clave` LONGTEXT NOT NULL,
+				`mail` VARCHAR(45) NOT NULL UNIQUE,
+				`turno` VARCHAR(45) NOT NULL,
+				`perfil` VARCHAR(45) NOT NULL,
+				`fecha_creacion` VARCHAR(45) NOT NULL,
+				`foto` VARCHAR(45), 
+				PRIMARY KEY (`id`)
+			)");
+			
+			$newResponse->getBody()->write($consulta->execute());
+		}
+		return $newResponse;
+	}
+	
+	public function LlenarBBDD(){
+		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
+		$consulta =$objetoAccesoDato->RetornarConsulta("INSERT INTO empleados (nombre,apellido,clave,mail,turno,perfil,fecha_creacion,foto)
+	 		values
+			 ('Administrador','Administrator','admin','admin@admin.com','mañana','admin','15/11/16'), 
+			 ('Usuario','User','user','user@user.com','tarde','user','24/12/16')");
+	
+		return $consulta->execute();
+	}
+	
+	public function TraerUno($request, $response, $args) {
+		$id=$args['id'];		
+		$laempleado=empleado::TraerUnaempleado($id);
+
+		$newResponse = $response;
+		
+		if (!$laempleado) {
+			return $newResponse->getBody()->write('<p>ERROR!! No se encontró esa empleado.</p>');			
+		}	
+
+    	return $newResponse->withJson($laempleado, 200);
+    }
+
  	public function TraerUno($request, $response, $args) {
      	$mail=$args['mail'];
     	$elUsuario=Usuario::TraerUnUsuario($mail);
