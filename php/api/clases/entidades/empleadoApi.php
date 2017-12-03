@@ -1,16 +1,16 @@
 <?php
-require_once "../clases/usuario.php";
+require_once "../clases/empleado.php";
 require_once "../clases/autentificadorjwt.php";
 require_once ('./APIclases/IApiUsable.php');
 session_start();
 
-class usuarioApi extends Usuario implements IApiUsable{
+class empleadoApi extends Empleado implements IApiUsable{
 
 	public function CheckBBDD($request, $response, $next) {
 		$newResponse = $response;
 
 		try {
-			Empleado::TraerTodasLosEmpleados();
+			Empleado::TraerTodosLosEmpleados();
 			$newResponse = $next($request, $response);
 			
 		} catch (Exception $e) {
@@ -38,37 +38,35 @@ class usuarioApi extends Usuario implements IApiUsable{
 		$consulta =$objetoAccesoDato->RetornarConsulta("INSERT INTO empleados (nombre,apellido,clave,mail,turno,perfil,fecha_creacion,foto)
 	 		values
 			 ('Administrador','Administrator','admin','admin@admin.com','mañana','admin','15/11/16'), 
-			 ('Usuario','User','user','user@user.com','tarde','user','24/12/16')");
+			 ('empleado','User','user','user@user.com','tarde','user','24/12/16')");
 	
 		return $consulta->execute();
 	}
-	
-	public function TraerUno($request, $response, $args) {
-		$id=$args['id'];		
-		$laempleado=empleado::TraerUnaempleado($id);
-
-		$newResponse = $response;
-		
-		if (!$laempleado) {
-			return $newResponse->getBody()->write('<p>ERROR!! No se encontró esa empleado.</p>');			
-		}	
-
-    	return $newResponse->withJson($laempleado, 200);
-    }
 
  	public function TraerUno($request, $response, $args) {
-     	$mail=$args['mail'];
-    	$elUsuario=Usuario::TraerUnUsuario($mail);
-		$newResponse = $response->withJson($elUsuario, 200);
-		$newResponse = $newResponse->withAddedHeader('Token', 'unTokenCreado');
+     	$mail = $args['mail'];
+		$elempleado = Empleado::TraerUnEmpleado($mail);
+		
+		$newResponse = $response;
+		
+		if (!$elEmpleado) {
+			return $newResponse->getBody()->write('<p>ERROR!! No se encontró ese empleado.</p>');			
+		}	
 
-    	return $newResponse;
-    }
+    	return $newResponse->withJson($elEmpleado, 200);
+
+		//$newResponse = $response->withJson($elempleado, 200);
+		//$newResponse = $newResponse->withAddedHeader('Token', 'unTokenCreado');
+
+    	//return $newResponse;
+	}
+	
     public function TraerTodos($request, $response, $args) {
-      	$todosLosUsuarios=Usuario::TraerTodosLosUsuarios();
-     	$response = $response->withJson($todosLosUsuarios, 200);  
+      	$todosLosempleados=empleado::TraerTodosLosempleados();
+     	$response = $response->withJson($todosLosempleados, 200);  
     	return $response;
-    }
+	}
+	
     public function CargarUno($request, $response, $args) {
 		$ArrayDeParametros = $request->getParsedBody();
         //var_dump($ArrayDeParametros);
@@ -83,18 +81,18 @@ class usuarioApi extends Usuario implements IApiUsable{
 				$newResponse = $newResponse->withAddedHeader('alertType', "danger");
 				$rta = '<p>ERROR!! Ingrese todos los datos ("nombre", "apellido", "sexo", "correo" y "clave")</p>';
 			}else {
-				$miUsuario = new Usuario();
+				$miempleado = new empleado();
 				
-				$miUsuario->nombre=$ArrayDeParametros['nombre'];
-				$miUsuario->apellido=$ArrayDeParametros['apellido'];
-				$miUsuario->sexo=$ArrayDeParametros['sexo'];
-				$miUsuario->correo=$ArrayDeParametros['correo'];
+				$miempleado->nombre=$ArrayDeParametros['nombre'];
+				$miempleado->apellido=$ArrayDeParametros['apellido'];
+				$miempleado->sexo=$ArrayDeParametros['sexo'];
+				$miempleado->correo=$ArrayDeParametros['correo'];
 				
-				$miUsuario->setClave($ArrayDeParametros['clave']);
-				$miUsuario->nivel=-4;
+				$miempleado->setClave($ArrayDeParametros['clave']);
+				$miempleado->nivel=-4;
 				
 				$newResponse = $newResponse->withAddedHeader('alertType', "success");
-				$rta = $miUsuario->GuardarUsuario();
+				$rta = $miempleado->Guardarempleado();
 			}	
 		}
 		$newResponse->getBody()->write($rta);
@@ -119,18 +117,18 @@ class usuarioApi extends Usuario implements IApiUsable{
 				$newResponse = $newResponse->withAddedHeader('alertType', "danger");
 				$rta = '<p>ERROR!! Ingrese todos los datos ("nombre", "apellido", "sexo", "correo" y "clave")</p>';
 			}else {
-				$miUsuario = Usuario::TraerUnUsuario();
+				$miempleado = empleado::TraerUnempleado();
 				
-				$miUsuario->nombre=$ArrayDeParametros['nombre'];
-				$miUsuario->apellido=$ArrayDeParametros['apellido'];
-				$miUsuario->sexo=$ArrayDeParametros['sexo'];
-				$miUsuario->correo=$ArrayDeParametros['correo'];
+				$miempleado->nombre=$ArrayDeParametros['nombre'];
+				$miempleado->apellido=$ArrayDeParametros['apellido'];
+				$miempleado->sexo=$ArrayDeParametros['sexo'];
+				$miempleado->correo=$ArrayDeParametros['correo'];
 				
-				$miUsuario->setClave($ArrayDeParametros['clave']);
-				$miUsuario->nivel=-4;
+				$miempleado->setClave($ArrayDeParametros['clave']);
+				$miempleado->nivel=-4;
 				
 				$newResponse = $newResponse->withAddedHeader('alertType', "success");
-				$rta = $miUsuario->GuardarUsuario();
+				$rta = $miempleado->Guardarempleado();
 			}	
 		}
 		$newResponse->getBody()->write($rta);
@@ -147,10 +145,10 @@ class usuarioApi extends Usuario implements IApiUsable{
 			$ArrayDeParametros = $request->getParsedBody();
 			$id=$ArrayDeParametros['id'];
 			
-			$usuario= new Usuario();
-			$usuario->id=$id;
+			$empleado= new empleado();
+			$empleado->id=$id;
 			
-			$cantidadDeBorrados=$usuario->BorrarUsuario();
+			$cantidadDeBorrados=$empleado->Borrarempleado();
 
 			if($cantidadDeBorrados>0){
 				$newResponse = $newResponse->withAddedHeader('alertType', "success");
@@ -188,22 +186,22 @@ class usuarioApi extends Usuario implements IApiUsable{
 					$newResponse = $newResponse->withAddedHeader('alertType', "danger");
 					$rta = '<p>ERROR!! Ingrese todos los datos ("nombre", "apellido", "sexo", "correo" y "nivel")</p>';
 				}else {
-					$idUsuario = $request->getHeader('UserNum');
-					$idUsuario = $idUsuario[0];
+					$idempleado = $request->getHeader('UserNum');
+					$idempleado = $idempleado[0];
 					
-					$miUsuario = Usuario::TraerUnUsuarioPorId($idUsuario);
+					$miempleado = empleado::TraerUnempleadoPorId($idempleado);
 					
-					$miUsuario->nombre=$ArrayDeParametros['nombre'];
-					$miUsuario->apellido=$ArrayDeParametros['apellido'];
-					$miUsuario->sexo=$ArrayDeParametros['sexo'];
-					$miUsuario->correo=$ArrayDeParametros['correo'];
-					$miUsuario->nivel=$ArrayDeParametros['nivel'];
+					$miempleado->nombre=$ArrayDeParametros['nombre'];
+					$miempleado->apellido=$ArrayDeParametros['apellido'];
+					$miempleado->sexo=$ArrayDeParametros['sexo'];
+					$miempleado->correo=$ArrayDeParametros['correo'];
+					$miempleado->nivel=$ArrayDeParametros['nivel'];
 					
 					$newResponse = $newResponse->withAddedHeader('alertType', "success");
-					if ($miUsuario->ModificarUsuario()>0) {
-						$rta = "Usuario modificado";
+					if ($miempleado->Modificarempleado()>0) {
+						$rta = "empleado modificado";
 					} else {
-						$rta = "No se modificó el usuario";
+						$rta = "No se modificó el empleado";
 					}
 				}	
 			}			
@@ -235,35 +233,35 @@ class usuarioApi extends Usuario implements IApiUsable{
 				$clave= $ArrayDeParametros['clave'];
 
 
-				switch (Usuario::VerificarClave($correo,$clave)) {
+				switch (empleado::VerificarClave($correo,$clave)) {
 					case true:
-						$unUsuario = Usuario::TraerUnUsuario($correo);
+						$unempleado = empleado::TraerUnempleado($correo);
         				
 						$_SESSION["user"] = $correo;
-        				$_SESSION["lvl"] = $unUsuario->nivel;
+        				$_SESSION["lvl"] = $unempleado->nivel;
 
 						
 						//Datos para el token
-						$datosUsuario = array(
-							'nombre' => $unUsuario->nombre,
-							'correo' => $unUsuario->correo,
-							'nivel' => $unUsuario->nivel,
-							'sexo' => $unUsuario->sexo
+						$datosempleado = array(
+							'nombre' => $unempleado->nombre,
+							'correo' => $unempleado->correo,
+							'nivel' => $unempleado->nivel,
+							'sexo' => $unempleado->sexo
 						);
 
-						$token = autentificadorJWT::crearJWT($datosUsuario);
+						$token = autentificadorJWT::crearJWT($datosempleado);
 						$newResponse = $newResponse->withAddedHeader('token', $token);
 						
-						$newResponse = $newResponse->withAddedHeader('datos', json_encode($datosUsuario));
+						$newResponse = $newResponse->withAddedHeader('datos', json_encode($datosempleado));
 
 						$newResponse = $newResponse->withAddedHeader('alertType', "success");
-						$rta = "<strong>¡Bien!</strong> Usuario (e-mail) y clave válidos";
+						$rta = "<strong>¡Bien!</strong> empleado (e-mail) y clave válidos";
 						
 						break;
 					
 					case false:
 						$newResponse = $newResponse->withAddedHeader('alertType', "danger");
-						$rta = "<strong>ERROR!</strong> Usuario y clave inválidos";
+						$rta = "<strong>ERROR!</strong> empleado y clave inválidos";
 						break;
 
 					case 'NOMAIL':
