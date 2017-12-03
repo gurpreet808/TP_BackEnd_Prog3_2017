@@ -62,9 +62,10 @@ class empleadoApi extends Empleado implements IApiUsable{
 	}
 	
     public function TraerTodos($request, $response, $args) {
-      	$todosLosempleados=empleado::TraerTodosLosempleados();
-     	$response = $response->withJson($todosLosempleados, 200);  
-    	return $response;
+      	$todosLosEmpleados = Empleado::TraerTodosLosEmpleados();
+     	$response = $response->withJson($todosLosEmpleados, 200);  
+		
+		 return $response;
 	}
 	
     public function CargarUno($request, $response, $args) {
@@ -73,23 +74,52 @@ class empleadoApi extends Empleado implements IApiUsable{
 
 		$newResponse = $response;
 
-		if (!array_key_exists('nombre', $ArrayDeParametros) or !array_key_exists('apellido', $ArrayDeParametros) or !array_key_exists('sexo', $ArrayDeParametros) or !array_key_exists('correo', $ArrayDeParametros) or !array_key_exists('clave', $ArrayDeParametros)) {
+		if (!array_key_exists('nombre', $ArrayDeParametros) 
+		or !array_key_exists('apellido', $ArrayDeParametros) 
+		or !array_key_exists('clave', $ArrayDeParametros) 
+		or !array_key_exists('mail', $ArrayDeParametros) 
+		or !array_key_exists('turno', $ArrayDeParametros)
+		or !array_key_exists('perfil', $ArrayDeParametros)
+		or !array_key_exists('fecha_creacion', $ArrayDeParametros)) {
 			$newResponse = $newResponse->withAddedHeader('alertType', "warning");
-			$rta = '<p>Ingrese todas las keys ("nombre", "apellido", "sexo", "correo" y "clave")</p>';
+			$rta = '<p>Ingrese todas las keys (
+				"nombre", 
+				"apellido", 
+				"clave",
+				"mail",
+				"turno", 
+				"perfil" y 
+				"fecha_creacion"
+				)</p>';
 		} else {
-			if ($ArrayDeParametros['nombre']==null or $ArrayDeParametros['apellido']==null or $ArrayDeParametros['sexo']==null or $ArrayDeParametros['correo']==null) {
+			if ($ArrayDeParametros['nombre']==null 
+			or $ArrayDeParametros['apellido']==null 
+			or $ArrayDeParametros['clave']==null
+			or $ArrayDeParametros['mail']==null 
+			or $ArrayDeParametros['turno']==null
+			or $ArrayDeParametros['perfil']==null
+			or $ArrayDeParametros['fecha_creacion']==null) {
 				$newResponse = $newResponse->withAddedHeader('alertType', "danger");
-				$rta = '<p>ERROR!! Ingrese todos los datos ("nombre", "apellido", "sexo", "correo" y "clave")</p>';
+				$rta = '<p>ERROR!! Ingrese todos los datos (
+					"nombre", 
+					"apellido", 
+					"clave",
+					"mail",
+					"turno", 
+					"perfil" y 
+					"fecha_creacion"
+					)</p>';
 			}else {
 				$miempleado = new empleado();
 				
 				$miempleado->nombre=$ArrayDeParametros['nombre'];
 				$miempleado->apellido=$ArrayDeParametros['apellido'];
-				$miempleado->sexo=$ArrayDeParametros['sexo'];
-				$miempleado->correo=$ArrayDeParametros['correo'];
-				
+				$miempleado->mail=$ArrayDeParametros['mail'];
+				$miempleado->turno=$ArrayDeParametros['turno'];
+				$miempleado->perfil=$ArrayDeParametros['perfil'];
+				$miempleado->fecha_creacion=$ArrayDeParametros['fecha_creacion'];
+
 				$miempleado->setClave($ArrayDeParametros['clave']);
-				$miempleado->nivel=-4;
 				
 				$newResponse = $newResponse->withAddedHeader('alertType', "success");
 				$rta = $miempleado->Guardarempleado();
@@ -100,6 +130,7 @@ class empleadoApi extends Empleado implements IApiUsable{
         return $newResponse;
     }
 
+	/*
 	public function MiPerfil($request, $response, $args) {
 		$ArrayDeParametros = $request->getParsedBody();
 		$tokenAuth = $request->getHeader('Authorization');
@@ -134,7 +165,7 @@ class empleadoApi extends Empleado implements IApiUsable{
 		$newResponse->getBody()->write($rta);
 
         return $newResponse;
-    }
+	}*/
 
     public function BorrarUno($request, $response, $args) {
 		$tokenAuth = $request->getHeader('Authorization');
