@@ -57,8 +57,6 @@ class MWparaAutentificar
 			}									
 				          
 		} else {
-			//   $response->getBody()->write('<p>no tenes habilitado el ingreso</p>');
-
 			//ACA ENTRO EL TOKEN EXPIRADO
 			if ($objDelaRespuesta->excepcion == "Token no valido --Expired token") {
 				$objDelaRespuesta->respuesta="Su sesión expiró, debe loguearse nuevamente";
@@ -90,20 +88,31 @@ class MWparaAutentificar
 	
 	public function VerificarAdmin($request, $response, $next) {
 		$objDelaRespuesta = self::VerificarToken($request);
+
+		$newResponse = $response;
 	
 		if ($objDelaRespuesta == null or array_key_exists('payload',$objDelaRespuesta)) {
 			if ($objDelaRespuesta->payload["perfil"]!="admin") {
 				$objDelaRespuesta->esValido = false;
 				$objDelaRespuesta->respuesta = "Solo administradores";
+
+				$token = AutentificadorJWT::refrescarToken($objDelaRespuesta->payload);
+				//var_dump($token);
+				$newResponse = $newResponse->withAddedHeader('token', $token);
 				unset($objDelaRespuesta->payload);
 			} else {
-				return $response = $next($request, $response);
+				$newResponse = $next($request, $response);
+				//var_dump($objDelaRespuesta->payload);
+				$token = AutentificadorJWT::refrescarToken($objDelaRespuesta->payload);
+				//var_dump($token);
+				$newResponse = $newResponse->withAddedHeader('token', $token);
 			}
 		} 
 		
 		if (!$objDelaRespuesta->esValido) {
-			$nueva = $response->withJson($objDelaRespuesta, 401);
-			return $nueva;
+			$newResponse = $newResponse->withJson($objDelaRespuesta, 401);
 		}
+
+		return $newResponse;
 	}
 }
