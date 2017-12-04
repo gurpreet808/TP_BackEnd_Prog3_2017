@@ -17,20 +17,17 @@ class MWparaAutentificar
    * @apiExample Como usarlo:
    *    ->add(\MWparaAutenticar::class . ':VerificarUsuario')
    */
-	public function VerificarUsuario($request, $response, $next) {
+	public static function VerificarToken($request) {
          
 		$objDelaRespuesta= new stdclass();
 		$objDelaRespuesta->respuesta="";
-	   	  
-		//$response->getBody()->write('<p>verifico credenciales</p>');
 
 		//tomo el token del header
 		$arrayConToken = $request->getHeader('Authorization');
-		
 		//var_dump($arrayConToken);
 		$token = $arrayConToken[0];			
-		
 		//var_dump($token);
+
 		$objDelaRespuesta->esValido=true; 
 		try {		
 			//var_dump(autentificadorJWT::decodificarToken($token));
@@ -44,13 +41,9 @@ class MWparaAutentificar
 
 		if($objDelaRespuesta->esValido) {
 			//echo "***TOKEN VALIDO***";						
-			$payload = AutentificadorJWT::dataDelToken($token);
-			//var_dump($payload);
-			if($payload["perfil"]=="admin") {
-				$response = $next($request, $response);
-			} else {	
-				$objDelaRespuesta->respuesta="Solo administradores";
-			}		          
+			$objDelaRespuesta->payload = AutentificadorJWT::dataDelToken($token);
+			//var_dump($objDelaRespuesta->payload);
+				          
 		} else {
 			//   $response->getBody()->write('<p>no tenes habilitado el ingreso</p>');
 
@@ -61,16 +54,40 @@ class MWparaAutentificar
 				$objDelaRespuesta->respuesta="Solo usuarios registrados";
 			}
 			
-
 			$objDelaRespuesta->elToken=$token;
-		}  
-		
-		if($objDelaRespuesta->respuesta!="") {
+		}
+
+		return $objDelaRespuesta;   
+	}
+
+	public function VerificarUsuario($request, $response, $next) {
+		$objDelaRespuesta = self::VerificarToken($request);
+
+		if ($objDelaRespuesta == null or !array_key_exists('payload',$objDelaRespuesta)) {
 			$nueva=$response->withJson($objDelaRespuesta, 401);
 			return $nueva;
+		} else {
+			$response = $next($request, $response);
+		}		
+
+		return $response;
+	}
+	
+	public function VerificarAdmin($request, $response, $next) {
+		$objDelaRespuesta = self::VerificarToken($request);
+	
+		if ($objDelaRespuesta == null or array_key_exists('payload',$objDelaRespuesta)) {
+			if ($objDelaRespuesta->payload["perfil"]!="admin") {
+				$objDelaRespuesta->esValido = false;
+				$objDelaRespuesta->respuesta = "Solo administradores";
+			} else {
+				return $response = $next($request, $response);
+			}
+		} 
+		
+		if (!$objDelaRespuesta->esValido) {
+			$nueva = $response->withJson($objDelaRespuesta, 401);
+			return $nueva;
 		}
-		  
-		//$response->getBody()->write('<p>vuelvo del verificador de credenciales</p>');
-		return $response;   
 	}
 }

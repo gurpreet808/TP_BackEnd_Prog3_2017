@@ -38,16 +38,16 @@ $app->group('/empleado', function () {
   //Logueados
   $this->get('/', \empleadoApi::class . ':traerTodos')->add(\MWparaAutentificar::class . ':VerificarUsuario');
   
-  $this->get('/{mail}', \empleadoApi::class . ':traerUno')->add(\MWparaCORS::class . ':HabilitarCORSTodos');
+  $this->get('/{mail}', \empleadoApi::class . ':traerUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
 
-  $this->post('/modificarme', \empleadoApi::class . ':CargarUno');
+  $this->post('/modificarme', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
 
   //Administradores
-  $this->post('/', \empleadoApi::class . ':CargarUno');
+  $this->post('/', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');
 
-  $this->delete('/', \empleadoApi::class . ':BorrarUno')->add(\MWparaCORS::class . ':HabilitarCORSTodos');
+  $this->delete('/', \empleadoApi::class . ':BorrarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');
  
-  $this->put('/', \empleadoApi::class . ':ModificarUno');
+  $this->put('/', \empleadoApi::class . ':ModificarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');
  
  });
 
