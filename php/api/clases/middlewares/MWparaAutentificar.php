@@ -40,9 +40,16 @@ class MWparaAutentificar
 		}
 
 		if($objDelaRespuesta->esValido) {
-			//echo "***TOKEN VALIDO***";						
+			//echo "***TOKEN VALIDO***";
 			$objDelaRespuesta->payload = AutentificadorJWT::dataDelToken($token);
 			//var_dump($objDelaRespuesta->payload);
+			
+			//Deshabilita cualquier cosa que quiera hacer un SUSPENDIDO
+			if ($objDelaRespuesta->payload["perfil"]==="suspendido") {
+				$objDelaRespuesta->respuesta = "Usted está suspendido";
+				$objDelaRespuesta->esValido = false;
+				unset($objDelaRespuesta->payload);
+			}									
 				          
 		} else {
 			//   $response->getBody()->write('<p>no tenes habilitado el ingreso</p>');
@@ -80,6 +87,7 @@ class MWparaAutentificar
 			if ($objDelaRespuesta->payload["perfil"]!="admin") {
 				$objDelaRespuesta->esValido = false;
 				$objDelaRespuesta->respuesta = "Solo administradores";
+				unset($objDelaRespuesta->payload);
 			} else {
 				return $response = $next($request, $response);
 			}
