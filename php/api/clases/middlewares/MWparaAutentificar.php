@@ -71,13 +71,16 @@ class MWparaAutentificar
 		$objDelaRespuesta = self::VerificarToken($request);
 
 		if ($objDelaRespuesta == null or !array_key_exists('payload',$objDelaRespuesta)) {
-			$nueva=$response->withJson($objDelaRespuesta, 401);
-			return $nueva;
+			$newResponse = $response->withJson($objDelaRespuesta, 401);
 		} else {
-			$response = $next($request, $response);
+			$newResponse = $next($request, $response);
+			var_dump($objDelaRespuesta->payload);
+			$token = AutentificadorJWT::refrescarToken($objDelaRespuesta->payload);
+			var_dump($token);
+			$newResponse = $newResponse->withAddedHeader('token', $token);
 		}		
 
-		return $response;
+		return $newResponse;
 	}
 	
 	public function VerificarAdmin($request, $response, $next) {
