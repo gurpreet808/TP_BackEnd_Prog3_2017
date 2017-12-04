@@ -31,16 +31,23 @@ $app->add(function ($req, $res, $next) {
 
 /*empleado*/
 $app->group('/empleado', function () {
+    
+  //Públicos
+  $this->post('/login', \empleadoApi::class . ':LogIn');
   
-   $this->get('/', \empleadoApi::class . ':traerTodos')->add(\MWparaCORS::class . ':HabilitarCORSTodos');
+  //Logueados
+  $this->get('/', \empleadoApi::class . ':traerTodos')->add(\MWparaAutentificar::class . ':VerificarUsuario');
   
-   $this->get('/{mail}', \empleadoApi::class . ':traerUno')->add(\MWparaCORS::class . ':HabilitarCORSTodos');
+  $this->get('/{mail}', \empleadoApi::class . ':traerUno')->add(\MWparaCORS::class . ':HabilitarCORSTodos');
+
+  $this->post('/modificarme', \empleadoApi::class . ':CargarUno');
+
+  //Administradores
+  $this->post('/', \empleadoApi::class . ':CargarUno');
+
+  $this->delete('/', \empleadoApi::class . ':BorrarUno')->add(\MWparaCORS::class . ':HabilitarCORSTodos');
  
-   $this->post('/', \empleadoApi::class . ':CargarUno');
- 
-   $this->delete('/', \empleadoApi::class . ':BorrarUno')->add(\MWparaCORS::class . ':HabilitarCORSTodos');
- 
-   $this->put('/', \empleadoApi::class . ':ModificarUno');
+  $this->put('/', \empleadoApi::class . ':ModificarUno');
  
  });
 

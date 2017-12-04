@@ -55,11 +55,6 @@ class empleadoApi extends Empleado implements IApiUsable{
 		}	
 
     	return $newResponse->withJson($elEmpleado, 200);
-
-		//$newResponse = $response->withJson($elempleado, 200);
-		//$newResponse = $newResponse->withAddedHeader('Token', 'unTokenCreado');
-
-    	//return $newResponse;
 	}
 	
     public function TraerTodos($request, $response, $args) {
@@ -132,6 +127,95 @@ class empleadoApi extends Empleado implements IApiUsable{
 
         return $newResponse;
     }
+
+
+	public function LogIn($request, $response, $args) {
+		$ArrayDeParametros = $request->getParsedBody();
+        //var_dump($ArrayDeParametros);
+
+		$newResponse = $response;
+
+		if ($ArrayDeParametros == null
+		or !array_key_exists('mail', $ArrayDeParametros) 
+		or !array_key_exists('clave', $ArrayDeParametros)
+		or !array_key_exists('clave_coincidencia', $ArrayDeParametros)) {
+			$newResponse = $newResponse->withAddedHeader('alertType', "warning");
+			$rta = '<p>Ingrese todas las keys (
+				"mail",
+				"clave" y 
+				"clave_coincidencia"
+				)</p>';
+		} else {
+			if ($ArrayDeParametros['mail']==null 
+			or $ArrayDeParametros['clave']==null
+			or $ArrayDeParametros['clave_coincidencia']==null) {
+				$newResponse = $newResponse->withAddedHeader('alertType', "danger");
+				$rta = '<p>ERROR!! Ingrese todos los datos (
+					"mail",
+					"clave" y 
+					"clave_coincidencia"
+					)</p>';
+			}else {
+
+				$mail=$ArrayDeParametros['mail'];
+				$clave=$ArrayDeParametros['clave'];
+				$clave_coincidencia=$ArrayDeParametros['clave_coincidencia'];
+
+				if ($clave != $clave_coincidencia) {
+					$rta = '<p>ERROR!! Las claves no coinciden</p>';
+				} else {					
+					
+					//Dar token
+
+					$token = "";
+
+					switch (empleado::VerificarClave($mail, $clave)) {
+						case "VALIDO":
+							$unEmpleado = empleado::TraerUnEmpleado($mail);
+							
+							//Datos para el token
+							$datosEmpleado = array(
+								'nombre' => $unEmpleado->nombre,
+								'mail' => $unEmpleado->mail,
+								'perfil' => $unEmpleado->perfil
+							);
+	
+							$token = autentificadorJWT::crearJWT($datosEmpleado);
+							$newResponse = $newResponse->withAddedHeader('token', $token);
+							
+							$newResponse = $newResponse->withAddedHeader('datos', json_encode($datosEmpleado));
+	
+							$newResponse = $newResponse->withAddedHeader('alertType', "success");
+							$rta = "<strong>¡Bien!</strong> empleado (e-mail) y clave válidos";
+							
+							break;
+						
+						case "NO_VALIDO":
+							$newResponse = $newResponse->withAddedHeader('alertType', "danger");
+							$newResponse = $newResponse->withAddedHeader('token', $token);
+							$rta = "<strong>ERROR!</strong> empleado y clave inválidos";
+							break;
+	
+						case 'NO_MAIL':
+							$newResponse = $newResponse->withAddedHeader('alertType', "warning");
+							$newResponse = $newResponse->withAddedHeader('token', $token);
+							$rta = "No se encuentra el mail que ingresó";
+							break;
+						
+						default:
+							# code...
+							break;
+					}
+				}				
+			}	
+		}
+		
+		$newResponse->getBody()->write($rta);
+
+        return $newResponse;
+    }
+
+
 
 	/*
 	public function MiPerfil($request, $response, $args) {
@@ -255,70 +339,6 @@ class empleadoApi extends Empleado implements IApiUsable{
 		$newResponse->getBody()->write($rta);
 
         return $newResponse;	
-    }
-
-	public function LogIn($request, $response, $args) {
-		$ArrayDeParametros = $request->getParsedBody();
-        //var_dump($ArrayDeParametros);
-		$newResponse = $response;
-
-		if (!array_key_exists('correo', $ArrayDeParametros) or !array_key_exists('clave', $ArrayDeParametros)) {
-			$newResponse = $newResponse->withAddedHeader('alertType', "warning");
-			$rta = '<p>Ingrese todas las keys ("correo" y "clave")</p>';
-		} else {
-			if ($ArrayDeParametros['correo']==null or $ArrayDeParametros['clave']==null) {
-				$newResponse = $newResponse->withAddedHeader('alertType', "danger");
-				$rta = '<p>ERROR!! Ingrese todos los datos ("correo" y "clave")</p>';
-			}else {
-				$correo= $ArrayDeParametros['correo'];
-				$clave= $ArrayDeParametros['clave'];
-
-
-				switch (empleado::VerificarClave($correo,$clave)) {
-					case true:
-						$unempleado = empleado::TraerUnempleado($correo);
-        				
-						$_SESSION["user"] = $correo;
-        				$_SESSION["lvl"] = $unempleado->nivel;
-
-						
-						//Datos para el token
-						$datosempleado = array(
-							'nombre' => $unempleado->nombre,
-							'correo' => $unempleado->correo,
-							'nivel' => $unempleado->nivel,
-							'sexo' => $unempleado->sexo
-						);
-
-						$token = autentificadorJWT::crearJWT($datosempleado);
-						$newResponse = $newResponse->withAddedHeader('token', $token);
-						
-						$newResponse = $newResponse->withAddedHeader('datos', json_encode($datosempleado));
-
-						$newResponse = $newResponse->withAddedHeader('alertType', "success");
-						$rta = "<strong>¡Bien!</strong> empleado (e-mail) y clave válidos";
-						
-						break;
-					
-					case false:
-						$newResponse = $newResponse->withAddedHeader('alertType', "danger");
-						$rta = "<strong>ERROR!</strong> empleado y clave inválidos";
-						break;
-
-					case 'NOMAIL':
-						$newResponse = $newResponse->withAddedHeader('alertType', "warning");
-						$rta = "No se encuentra el mail que ingresó";
-						break;
-					
-					default:
-						# code...
-						break;
-				}
-			}	
-		}
-		$newResponse->getBody()->write($rta);
-		
-		return $newResponse;
     }
 
 	public function LogOut($request, $response, $args) {

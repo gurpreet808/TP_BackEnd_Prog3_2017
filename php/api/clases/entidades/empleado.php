@@ -169,14 +169,14 @@ class Empleado{
 
     public static function VerificarClave($mail, $clave){
         if(empty(Empleado::TraerUnEmpleado($mail))){
-            return "NOMAIL";
+            return "NO_MAIL";
         } else {
             $unEmpleado = self::TraerUnEmpleado($mail);
             
             if ($unEmpleado->clave == $clave) {
-                return true;
+                return "VALIDO";
             } else {
-                return false;
+                return "NO_VALIDO";
             }
         }
     }
