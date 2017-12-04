@@ -296,15 +296,12 @@ class empleadoApi extends Empleado implements IApiUsable{
 				$miempleado->setClave($ArrayDeParametros['clave']);
 
 				$newResponse = $newResponse->withAddedHeader('alertType', "success");
-				if ($miempleado->Modificarempleado()>0) {
+				if ($miempleado->ModificarEmpleado()>0) {
 					$rta = "Empleado modificado";
+					$newResponse = $newResponse->withAddedHeader('alertType', "success");
 				} else {
 					$rta = "No se modificó el empleado";
-				}
-				
-				$newResponse = $newResponse->withAddedHeader('alertType', "success");
-
-				$rta = $miempleado->GuardarEmpleado();
+				}				
 			}	
 		}
 		$newResponse->getBody()->write($rta);

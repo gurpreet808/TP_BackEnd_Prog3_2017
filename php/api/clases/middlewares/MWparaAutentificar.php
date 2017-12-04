@@ -25,7 +25,12 @@ class MWparaAutentificar
 		//tomo el token del header
 		$arrayConToken = $request->getHeader('Authorization');
 		//var_dump($arrayConToken);
-		$token = $arrayConToken[0];			
+		
+		$token = "";
+
+		if (!empty($arrayConToken)) {
+			$token = $arrayConToken[0];			
+		}
 		//var_dump($token);
 
 		$objDelaRespuesta->esValido=true; 
@@ -74,9 +79,9 @@ class MWparaAutentificar
 			$newResponse = $response->withJson($objDelaRespuesta, 401);
 		} else {
 			$newResponse = $next($request, $response);
-			var_dump($objDelaRespuesta->payload);
+			//var_dump($objDelaRespuesta->payload);
 			$token = AutentificadorJWT::refrescarToken($objDelaRespuesta->payload);
-			var_dump($token);
+			//var_dump($token);
 			$newResponse = $newResponse->withAddedHeader('token', $token);
 		}		
 
