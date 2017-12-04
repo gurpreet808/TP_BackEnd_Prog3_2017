@@ -34,7 +34,7 @@ class MWparaAutentificar
 		//var_dump($token);
 		$objDelaRespuesta->esValido=true; 
 		try {		
-			var_dump(autentificadorJWT::decodificarToken($token));
+			//var_dump(autentificadorJWT::decodificarToken($token));
 			AutentificadorJWT::verificarToken($token);
 			$objDelaRespuesta->esValido=true;      
 		} catch (Exception $e) {      
@@ -50,10 +50,10 @@ class MWparaAutentificar
 				$response = $next($request, $response);
 			}
 			else {
-				$payload=AutentificadorJWT::ObtenerData($token);
-				//var_dump($payload);
+				$payload = AutentificadorJWT::dataDelToken($token);
+				var_dump($payload);
 				// DELETE,PUT y DELETE sirve para todos los logeados y admin
-				if($payload->perfil=="admin") {
+				if($payload["perfil"]=="admin") {
 					$response = $next($request, $response);
 				}		           	
 				else {	

@@ -37,14 +37,14 @@ class autentificadorJWT
 
     static public function verificarToken($unToken){
         //manejar excepcion de que expiró
-
-        if(empty($token)|| $token==""){
+        var_dump($unToken);
+        if(empty($unToken) || $unToken==""){
             throw new Exception("El token esta vacio.");
             return false;
         } 
         // las siguientes lineas lanzan una excepcion, de no ser correcto o de haberse terminado el tiempo       
         try {
-            $decodificado = JWT::decode($token,self::$claveSecreta,self::$tipoEncriptacion);
+            $decodificado = self::decodificarToken($unToken);
         } catch (Exception $e) {           
            throw new Exception("Token no valido --".$e->getMessage());
            return false;

@@ -128,7 +128,6 @@ class empleadoApi extends Empleado implements IApiUsable{
         return $newResponse;
     }
 
-
 	public function LogIn($request, $response, $args) {
 		$ArrayDeParametros = $request->getParsedBody();
         //var_dump($ArrayDeParametros);
@@ -209,147 +208,116 @@ class empleadoApi extends Empleado implements IApiUsable{
 				}				
 			}	
 		}
-		
+
 		$newResponse->getBody()->write($rta);
 
         return $newResponse;
     }
 
-
-
-	/*
-	public function MiPerfil($request, $response, $args) {
-		$ArrayDeParametros = $request->getParsedBody();
-		$tokenAuth = $request->getHeader('Authorization');
-		$tokenAuth = $tokenAuth[0];
-
-		autentificadorJWT::dataDelToken($tokenAuth);
-
-		$newResponse = $response;
-
-		if (!array_key_exists('nombre', $ArrayDeParametros) or !array_key_exists('apellido', $ArrayDeParametros) or !array_key_exists('sexo', $ArrayDeParametros) or !array_key_exists('correo', $ArrayDeParametros) or !array_key_exists('clave', $ArrayDeParametros)) {
-			$newResponse = $newResponse->withAddedHeader('alertType', "warning");
-			$rta = '<p>Ingrese todas las keys ("nombre", "apellido", "sexo", "correo" y "clave")</p>';
-		} else {
-			if ($ArrayDeParametros['nombre']==null or $ArrayDeParametros['apellido']==null or $ArrayDeParametros['sexo']==null or $ArrayDeParametros['correo']==null) {
-				$newResponse = $newResponse->withAddedHeader('alertType', "danger");
-				$rta = '<p>ERROR!! Ingrese todos los datos ("nombre", "apellido", "sexo", "correo" y "clave")</p>';
-			}else {
-				$miempleado = empleado::TraerUnempleado();
-				
-				$miempleado->nombre=$ArrayDeParametros['nombre'];
-				$miempleado->apellido=$ArrayDeParametros['apellido'];
-				$miempleado->sexo=$ArrayDeParametros['sexo'];
-				$miempleado->correo=$ArrayDeParametros['correo'];
-				
-				$miempleado->setClave($ArrayDeParametros['clave']);
-				$miempleado->nivel=-4;
-				
-				$newResponse = $newResponse->withAddedHeader('alertType', "success");
-				$rta = $miempleado->Guardarempleado();
-			}	
-		}
-		$newResponse->getBody()->write($rta);
-
-        return $newResponse;
-	}*/
-
     public function BorrarUno($request, $response, $args) {
-		//$tokenAuth = $request->getHeader('Authorization');
-		//$tokenAuth = $tokenAuth[0];
 		$newResponse = $response;
-		 
-		//if ($_SESSION["user"] == $tokenAuth && $_SESSION["lvl"]==0) {
-			$ArrayDeParametros = $request->getParsedBody();
-			$id = $ArrayDeParametros['id'];
+		
+		$ArrayDeParametros = $request->getParsedBody();
+		$id = $ArrayDeParametros['id'];
 
-			if(empty(Empleado::TraerUnEmpleadoPorId($id))){
-				//no hay empleado
-				$newResponse = $newResponse->withAddedHeader('alertType', "danger");
-				$rta = "No se encontró ese empleado";
-			} else {
-				//hay empleado
-				$empleado = new empleado();
-				$empleado->id = $id;
-				
-				$cantidadDeBorrados = $empleado->Borrarempleado();
-	
-				if($cantidadDeBorrados>0) {
-					$newResponse = $newResponse->withAddedHeader('alertType', "success");
-					$rta = "Elementos borrados: ".$cantidadDeBorrados;
-				} else {
-					$newResponse = $newResponse->withAddedHeader('alertType', "danger");
-					$rta = "No se puedo borrar empleado";	
-				}
-			}
-			
-		/*} else {
+		if(empty(Empleado::TraerUnEmpleadoPorId($id))){
 			$newResponse = $newResponse->withAddedHeader('alertType', "danger");
-			$newResponse = $newResponse->withStatus(401);
-			$rta = "No tiene permiso para borrar";	
-		}*/	
+			$rta = "No se encontró ese empleado";
+		} else {
+			$empleado = new empleado();
+			$empleado->id = $id;
+			
+			$cantidadDeBorrados = $empleado->Borrarempleado();
+
+			if($cantidadDeBorrados>0) {
+				$newResponse = $newResponse->withAddedHeader('alertType', "success");
+				$rta = "Elementos borrados: ".$cantidadDeBorrados;
+			} else {
+				$newResponse = $newResponse->withAddedHeader('alertType', "danger");
+				$rta = "No se puedo borrar empleado";	
+			}
+		}
 
 		$newResponse->getBody()->write($rta);
+
 		return $newResponse;
     }
      
     public function ModificarUno($request, $response, $args) {
-
-		$tokenAuth = $request->getHeader('Authorization');
-		$tokenAuth = $tokenAuth[0];
 		$newResponse = $response;
-		 
-		if ($_SESSION["user"] == $tokenAuth && $_SESSION["lvl"]==0) {
-			$ArrayDeParametros = $request->getParsedBody();
-			$newResponse = $response;
+		
+		$ArrayDeParametros = $request->getParsedBody();
 
-			if (!array_key_exists('nombre', $ArrayDeParametros) or !array_key_exists('apellido', $ArrayDeParametros) or !array_key_exists('sexo', $ArrayDeParametros) or !array_key_exists('correo', $ArrayDeParametros) or !array_key_exists('nivel', $ArrayDeParametros)) {
-				$newResponse = $newResponse->withAddedHeader('alertType', "warning");
-				$rta = '<p>Ingrese todas las keys ("nombre", "apellido", "sexo", "correo" y "nivel")</p>';
-			} else {
-				if ($ArrayDeParametros['nombre']==null or $ArrayDeParametros['apellido']==null or $ArrayDeParametros['sexo']==null or $ArrayDeParametros['correo']==null) {
-					$newResponse = $newResponse->withAddedHeader('alertType', "danger");
-					$rta = '<p>ERROR!! Ingrese todos los datos ("nombre", "apellido", "sexo", "correo" y "nivel")</p>';
-				}else {
-					$idempleado = $request->getHeader('UserNum');
-					$idempleado = $idempleado[0];
-					
-					$miempleado = empleado::TraerUnempleadoPorId($idempleado);
-					
-					$miempleado->nombre=$ArrayDeParametros['nombre'];
-					$miempleado->apellido=$ArrayDeParametros['apellido'];
-					$miempleado->sexo=$ArrayDeParametros['sexo'];
-					$miempleado->correo=$ArrayDeParametros['correo'];
-					$miempleado->nivel=$ArrayDeParametros['nivel'];
-					
-					$newResponse = $newResponse->withAddedHeader('alertType', "success");
-					if ($miempleado->Modificarempleado()>0) {
-						$rta = "empleado modificado";
-					} else {
-						$rta = "No se modificó el empleado";
-					}
-				}	
-			}			
+		if ($ArrayDeParametros == null
+		or !array_key_exists('id', $ArrayDeParametros) 
+		or !array_key_exists('nombre', $ArrayDeParametros) 
+		or !array_key_exists('apellido', $ArrayDeParametros) 
+		or !array_key_exists('clave', $ArrayDeParametros) 
+		or !array_key_exists('mail', $ArrayDeParametros) 
+		or !array_key_exists('turno', $ArrayDeParametros)
+		or !array_key_exists('perfil', $ArrayDeParametros)) {
+			$newResponse = $newResponse->withAddedHeader('alertType', "warning");
+			$rta = '<p>Ingrese todas las keys (
+				"id",
+				"nombre", 
+				"apellido", 
+				"clave",
+				"mail",
+				"turno" y  
+				"perfil"
+				)</p>';
 		} else {
-			$newResponse = $newResponse->withAddedHeader('alertType', "danger");
-			$newResponse = $newResponse->withStatus(401);
-			$rta = "No tiene permiso para modificar";	
-		}		
+			if ($ArrayDeParametros['id']==null
+			or $ArrayDeParametros['nombre']==null  
+			or $ArrayDeParametros['apellido']==null 
+			or $ArrayDeParametros['clave']==null
+			or $ArrayDeParametros['mail']==null 
+			or $ArrayDeParametros['turno']==null
+			or $ArrayDeParametros['perfil']==null) {
+				$newResponse = $newResponse->withAddedHeader('alertType', "danger");
+				$rta = '<p>ERROR!! Ingrese todos los datos (
+					"id",
+					"nombre", 
+					"apellido", 
+					"clave",
+					"mail",
+					"turno" y 
+					"perfil"
+					)</p>';
+			}else {
+				$miempleado = empleado::TraerUnempleadoPorId($ArrayDeParametros['id']);
 
+				$miempleado->nombre=$ArrayDeParametros['nombre'];
+				$miempleado->apellido=$ArrayDeParametros['apellido'];
+				$miempleado->mail=$ArrayDeParametros['mail'];
+				$miempleado->turno=$ArrayDeParametros['turno'];
+				$miempleado->perfil=$ArrayDeParametros['perfil'];
+
+				$miempleado->setClave($ArrayDeParametros['clave']);
+
+				$newResponse = $newResponse->withAddedHeader('alertType', "success");
+				if ($miempleado->Modificarempleado()>0) {
+					$rta = "Empleado modificado";
+				} else {
+					$rta = "No se modificó el empleado";
+				}
+				
+				$newResponse = $newResponse->withAddedHeader('alertType', "success");
+
+				$rta = $miempleado->GuardarEmpleado();
+			}	
+		}
 		$newResponse->getBody()->write($rta);
 
         return $newResponse;	
     }
 
 	public function LogOut($request, $response, $args) {
-		$_SESSION["user"] = null;
-        $_SESSION["lvl"] = null;
-		session_unset();
-        session_destroy();
-		
-		return $response->getBody()->write("Deslogueo Correcto");
+
+		$newResponse = $response;		
+		$newResponse = $newResponse->withAddedHeader('Authorization', "Bye bye..");
+
+		return $newResponse->getBody()->write("Deslogueo Correcto");
     }
-
-
 }
 ?>
