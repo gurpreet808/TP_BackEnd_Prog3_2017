@@ -29,15 +29,13 @@ class autentificadorJWT
         return (array) $decodificado->data;      
     }
 
-    static public function refrescarToken($unToken){
-        //manejar excepcion de que expiró
-        $datos = self::dataDelToken($unToken);
+    static public function refrescarToken($datos){
+        //$datos = self::dataDelToken($unToken);
         return self::crearJWT($datos);
     }
 
     static public function verificarToken($unToken){
-        //manejar excepcion de que expiró
-        var_dump($unToken);
+        //var_dump($unToken);
         if(empty($unToken) || $unToken==""){
             throw new Exception("El token esta vacio.");
             return false;

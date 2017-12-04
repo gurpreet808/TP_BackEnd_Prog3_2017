@@ -27,8 +27,7 @@ class MWparaAutentificar
 		//tomo el token del header
 		$arrayConToken = $request->getHeader('Authorization');
 		
-		var_dump($arrayConToken);
-
+		//var_dump($arrayConToken);
 		$token = $arrayConToken[0];			
 		
 		//var_dump($token);
@@ -44,36 +43,34 @@ class MWparaAutentificar
 		}
 
 		if($objDelaRespuesta->esValido) {
-			echo "***TOKEN VALIDO***";						
-			if($request->isPost()) {		
-				// el post sirve para todos los logeados			    
+			//echo "***TOKEN VALIDO***";						
+			$payload = AutentificadorJWT::dataDelToken($token);
+			//var_dump($payload);
+			if($payload["perfil"]=="admin") {
 				$response = $next($request, $response);
-			}
-			else {
-				$payload = AutentificadorJWT::dataDelToken($token);
-				var_dump($payload);
-				// DELETE,PUT y DELETE sirve para todos los logeados y admin
-				if($payload["perfil"]=="admin") {
-					$response = $next($request, $response);
-				}		           	
-				else {	
-					$objDelaRespuesta->respuesta="Solo administradores";
-				}
+			} else {	
+				$objDelaRespuesta->respuesta="Solo administradores";
 			}		          
-		}    
-		else {
+		} else {
 			//   $response->getBody()->write('<p>no tenes habilitado el ingreso</p>');
-			$objDelaRespuesta->respuesta="Solo usuarios registrados";
-			$objDelaRespuesta->elToken=$token;
 
+			//ACA ENTRO EL TOKEN EXPIRADO
+			if ($objDelaRespuesta->excepcion == "Token no valido --Expired token") {
+				$objDelaRespuesta->respuesta="Su sesión expiró, debe loguearse nuevamente";
+			} else {
+				$objDelaRespuesta->respuesta="Solo usuarios registrados";
+			}
+			
+
+			$objDelaRespuesta->elToken=$token;
 		}  
 		
 		if($objDelaRespuesta->respuesta!="") {
-			$nueva=$response->withJson($objDelaRespuesta, 401);  
+			$nueva=$response->withJson($objDelaRespuesta, 401);
 			return $nueva;
 		}
 		  
-		 //$response->getBody()->write('<p>vuelvo del verificador de credenciales</p>');
-		 return $response;   
+		//$response->getBody()->write('<p>vuelvo del verificador de credenciales</p>');
+		return $response;   
 	}
 }
