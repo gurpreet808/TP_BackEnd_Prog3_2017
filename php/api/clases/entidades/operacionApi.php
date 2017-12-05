@@ -19,15 +19,19 @@ class operacionApi extends operacion implements IApiUsable{
 			$consulta =$objetoAccesoDato->RetornarConsulta("CREATE TABLE `operaciones` (
 				`patente` VARCHAR(10) NOT NULL, 
 				`color` VARCHAR(45) NOT NULL,
-				`marca` VARCHAR(45) NOT NULL, 
+				`marca` VARCHAR(45) NOT NULL,
+				`cochera` INT NOT NULL,  
 				`foto` VARCHAR(45), 
 				`id_empleado_ingreso` INT NOT NULL,
 				`fecha_hora_ingreso` VARCHAR(45) NOT NULL,
-				`id_empleado_salida` VARCHAR(45),
+				`id_empleado_salida` INT,
 				`fecha_hora_salida` VARCHAR(45),
 				`tiempo` INT,
 				`importe` FLOAT, 
-				PRIMARY KEY (`patente`,`fecha_hora_ingreso`)
+				PRIMARY KEY (`patente`,`fecha_hora_ingreso`),
+    			FOREIGN KEY (`id_empleado_ingreso`) REFERENCES `empleados`(`id`),
+				FOREIGN KEY (`id_empleado_salida`) REFERENCES `empleados`(`id`),
+				FOREIGN KEY (`cochera`) REFERENCES `cocheras`(`id_cochera`)
 			)");
 			
 			$newResponse->getBody()->write($consulta->execute());
@@ -65,6 +69,26 @@ class operacionApi extends operacion implements IApiUsable{
 		
 		 return $response;
 	}
+
+	public function OperacionesVehiculo($request, $response, $args) {
+		$patente = $args['patente'];
+		$todasLasOperaciones = operacion::TraerOperacionesDeUnVehiculo($patente);
+		
+		$newResponse = $response;
+		
+		if (!$todasLasOperaciones) {
+			return $newResponse->getBody()->write('<p>ERROR!! No se encontró esa patente.</p>');			
+		}	
+
+		return $newResponse->withJson($todasLasOperaciones, 200);
+	}
+
+	public function BuscarCocherasLibres($request, $response, $args) {
+		//$todasLasOperaciones = operacion::TraerTodasLasOperaciones();
+		//$response = $response->withJson($todasLasOperaciones, 200);  
+		
+		return operacion::CocherasLibres();
+	}
 	
     public function CargarUno($request, $response, $args) {
 		$ArrayDeParametros = $request->getParsedBody();
@@ -75,52 +99,78 @@ class operacionApi extends operacion implements IApiUsable{
 		if ($ArrayDeParametros == null
 		or !array_key_exists('patente', $ArrayDeParametros) 
 		or !array_key_exists('color', $ArrayDeParametros) 
-		or !array_key_exists('marca', $ArrayDeParametros)) {
+		or !array_key_exists('marca', $ArrayDeParametros)
+		or !array_key_exists('discapacitado_embarazada', $ArrayDeParametros)) {
 			$newResponse = $newResponse->withAddedHeader('alertType', "warning");
 			$rta = '<p>Ingrese todas las keys (
 				"patente", 
-				"color" y 
-				"marca"
+				"color", 
+				"marca" y
+				"discapacitado_embarazada"
 				)</p>';
 		} else {
 			if ($ArrayDeParametros['patente']==null 
 			or $ArrayDeParametros['color']==null 
-			or $ArrayDeParametros['marca']==null) {
+			or $ArrayDeParametros['marca']==null
+			or $ArrayDeParametros['discapacitado_embarazada']==null) {
 				$newResponse = $newResponse->withAddedHeader('alertType', "danger");
 				$rta = '<p>ERROR!! Ingrese todos los datos (
 					"patente", 
-					"color" y 
-					"marca"
+					"color",
+					"marca" y
+					"discapacitado_embarazada"
 					)</p>';
 			}else {
-				$mioperacion = new operacion();
-				
-				$mioperacion->patente=$ArrayDeParametros['patente'];
-				$mioperacion->color=$ArrayDeParametros['color'];
-				$mioperacion->marca=$ArrayDeParametros['marca'];
-				$mioperacion->fecha_hora_ingreso=date("Y-m-d H:i:s");
 
-				//extraer del token el ID
-
-				//tomo el token del header
-				$arrayConToken = $request->getHeader('Authorization');
-				//var_dump($arrayConToken);
-				
-				$token = "";
-
-				if (!empty($arrayConToken)) {
-					$token = $arrayConToken[0];			
+				if ($ArrayDeParametros['discapacitado_embarazada']!=="si" and $ArrayDeParametros['discapacitado_embarazada']!=="no") {
+					$rta = '<p>ERROR!! debe ingresar "si" o "no" en "discapacitado_embarazada")</p>';
+				} else {
+					$todasLasOperaciones = operacion::TraerOperacionesDeUnVehiculo($ArrayDeParametros['patente']);
+					
+					if ($todasLasOperaciones) {
+						return $newResponse->getBody()->write('<p>ERROR!! Ese vehiculo ya está estacionado en '."cochera".'.</p>');			
+					} else {
+						
+						operacion::CocherasLibres();
+						
+						$mioperacion = new operacion();
+						
+						$mioperacion->patente=$ArrayDeParametros['patente'];
+						$mioperacion->color=$ArrayDeParametros['color'];
+						$mioperacion->marca=$ArrayDeParametros['marca'];
+						$mioperacion->fecha_hora_ingreso=date("Y-m-d H:i:s");
+	
+						$mioperacion->cochera=1;
+		
+						//extraer del token el ID
+		
+						//tomo el token del header
+						$arrayConToken = $request->getHeader('Authorization');
+						//var_dump($arrayConToken);
+						
+						$token = "";
+		
+						if (!empty($arrayConToken)) {
+							$token = $arrayConToken[0];			
+						}
+		
+						$datos = autentificadorJWT::dataDelToken($token);
+		
+						//var_dump($datos);
+		
+						$mioperacion->id_empleado_ingreso=$datos["id"];
+						
+						$newResponse = $newResponse->withAddedHeader('alertType', "success");
+		
+						$rta = $mioperacion->EstacionarVehiculo();
+		
+						if ($rta) {
+							$rta = "Estacionó el vehiculo";
+						} else {
+							$rta = "No pudo estacionar el vehiculo";
+						}
+					}				
 				}
-
-				$datos = autentificadorJWT::dataDelToken($token);
-
-				//var_dump($datos);
-
-				$mioperacion->id_empleado_ingreso=$datos["id"];
-				
-				$newResponse = $newResponse->withAddedHeader('alertType', "success");
-
-				$rta = $mioperacion->EstacionarVehiculo();
 			}	
 		}
 		$newResponse->getBody()->write($rta);
