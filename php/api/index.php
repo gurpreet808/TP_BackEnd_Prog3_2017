@@ -31,7 +31,7 @@ $app->add(function ($req, $res, $next) {
 
 /*Empleado*/
 $app->group('/empleado', function () {
-    
+
   //Públicos
   $this->post('/login', \empleadoApi::class . ':LogIn');
   
@@ -43,13 +43,36 @@ $app->group('/empleado', function () {
   $this->post('/modificarme', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
 
   //Administradores
+  $this->post('/logueos/{mail}', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');  
+
+  $this->post('/operaciones/{mail}', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');    
+
   $this->post('/', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');
 
   $this->delete('/', \empleadoApi::class . ':BorrarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');
  
   $this->put('/', \empleadoApi::class . ':ModificarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');
- 
- });
+});
+
+/*Operaciones*/
+$app->group('/vehiculo', function () {
+  
+  //Logueados
+  $this->get('/', \operacionApi::class . ':traerTodos')->add(\MWparaAutentificar::class . ':VerificarUsuario');
+  
+  $this->get('/{patente}', \operacionApi::class . ':traerUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
+  
+  //$this->post('/modificar', \operacionApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
+  
+  $this->post('/estacionar', \operacionApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
+
+  $this->post('/sacar', \operacionApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
+  
+  //Administradores
+  $this->delete('/', \operacionApi::class . ':BorrarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');
+  
+  $this->put('/', \operacionApi::class . ':ModificarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');
+});
 
 /*Pizza*/
 $app->group('/pizza', function () {

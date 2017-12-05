@@ -1,6 +1,3 @@
 <?php
-require_once './clases/entidades/pizza.php';
-require_once './clases/AccesoDatos.php';
-
-var_dump(pizza::CheckBBDD());
-var_dump(pizza::LlenarBBDD());
+date_default_timezone_set('America/Argentina/Buenos_Aires');
+echo date("Y-m-d H:i:s e");
