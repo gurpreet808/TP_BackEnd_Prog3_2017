@@ -18,14 +18,16 @@ class operacionApi extends operacion implements IApiUsable{
 			$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
 			$consulta =$objetoAccesoDato->RetornarConsulta("CREATE TABLE `operaciones` (
 				`patente` VARCHAR(10) NOT NULL, 
-				`color` VARCHAR(45) NOT NULL, 
-				`foto` VARCHAR(45) NOT NULL, 
+				`color` VARCHAR(45) NOT NULL,
+				`marca` VARCHAR(45) NOT NULL, 
+				`foto` VARCHAR(45), 
 				`id_empleado_ingreso` INT NOT NULL,
 				`fecha_hora_ingreso` VARCHAR(45) NOT NULL,
 				`id_empleado_salida` VARCHAR(45),
 				`fecha_hora_salida` VARCHAR(45),
 				`tiempo` INT,
-				`importe` FLOAT
+				`importe` FLOAT, 
+				PRIMARY KEY (`patente`,`fecha_hora_ingreso`)
 			)");
 			
 			$newResponse->getBody()->write($consulta->execute());
@@ -33,6 +35,7 @@ class operacionApi extends operacion implements IApiUsable{
 		return $newResponse;
 	}
 	
+	/*
 	public function LlenarBBDD(){
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
 		$consulta =$objetoAccesoDato->RetornarConsulta("INSERT INTO operaciones (nombre,apellido,clave,mail,turno,perfil,fecha_creacion)
@@ -41,7 +44,7 @@ class operacionApi extends operacion implements IApiUsable{
 			 ('operacion','User','user','user@user.com','tarde','user','24/12/16')");
 	
 		return $consulta->execute();
-	}
+	}*/
 
  	public function TraerUno($request, $response, $args) {
      	$mail = $args['mail'];
@@ -70,56 +73,54 @@ class operacionApi extends operacion implements IApiUsable{
 		$newResponse = $response;
 
 		if ($ArrayDeParametros == null
-		or !array_key_exists('nombre', $ArrayDeParametros) 
-		or !array_key_exists('apellido', $ArrayDeParametros) 
-		or !array_key_exists('clave', $ArrayDeParametros) 
-		or !array_key_exists('mail', $ArrayDeParametros) 
-		or !array_key_exists('turno', $ArrayDeParametros)
-		or !array_key_exists('perfil', $ArrayDeParametros)
-		or !array_key_exists('fecha_creacion', $ArrayDeParametros)) {
+		or !array_key_exists('patente', $ArrayDeParametros) 
+		or !array_key_exists('color', $ArrayDeParametros) 
+		or !array_key_exists('marca', $ArrayDeParametros)) {
 			$newResponse = $newResponse->withAddedHeader('alertType', "warning");
 			$rta = '<p>Ingrese todas las keys (
-				"nombre", 
-				"apellido", 
-				"clave",
-				"mail",
-				"turno", 
-				"perfil" y 
-				"fecha_creacion"
+				"patente", 
+				"color" y 
+				"marca"
 				)</p>';
 		} else {
-			if ($ArrayDeParametros['nombre']==null 
-			or $ArrayDeParametros['apellido']==null 
-			or $ArrayDeParametros['clave']==null
-			or $ArrayDeParametros['mail']==null 
-			or $ArrayDeParametros['turno']==null
-			or $ArrayDeParametros['perfil']==null
-			or $ArrayDeParametros['fecha_creacion']==null) {
+			if ($ArrayDeParametros['patente']==null 
+			or $ArrayDeParametros['color']==null 
+			or $ArrayDeParametros['marca']==null) {
 				$newResponse = $newResponse->withAddedHeader('alertType', "danger");
 				$rta = '<p>ERROR!! Ingrese todos los datos (
-					"nombre", 
-					"apellido", 
-					"clave",
-					"mail",
-					"turno", 
-					"perfil" y 
-					"fecha_creacion"
+					"patente", 
+					"color" y 
+					"marca"
 					)</p>';
 			}else {
 				$mioperacion = new operacion();
 				
-				$mioperacion->nombre=$ArrayDeParametros['nombre'];
-				$mioperacion->apellido=$ArrayDeParametros['apellido'];
-				$mioperacion->mail=$ArrayDeParametros['mail'];
-				$mioperacion->turno=$ArrayDeParametros['turno'];
-				$mioperacion->perfil=$ArrayDeParametros['perfil'];
-				$mioperacion->fecha_creacion=$ArrayDeParametros['fecha_creacion'];
+				$mioperacion->patente=$ArrayDeParametros['patente'];
+				$mioperacion->color=$ArrayDeParametros['color'];
+				$mioperacion->marca=$ArrayDeParametros['marca'];
+				$mioperacion->fecha_hora_ingreso=date("Y-m-d H:i:s");
 
-				$mioperacion->setClave($ArrayDeParametros['clave']);
+				//extraer del token el ID
+
+				//tomo el token del header
+				$arrayConToken = $request->getHeader('Authorization');
+				//var_dump($arrayConToken);
+				
+				$token = "";
+
+				if (!empty($arrayConToken)) {
+					$token = $arrayConToken[0];			
+				}
+
+				$datos = autentificadorJWT::dataDelToken($token);
+
+				//var_dump($datos);
+
+				$mioperacion->id_empleado_ingreso=$datos["id"];
 				
 				$newResponse = $newResponse->withAddedHeader('alertType', "success");
 
-				$rta = $mioperacion->Guardaroperacion();
+				$rta = $mioperacion->EstacionarVehiculo();
 			}	
 		}
 		$newResponse->getBody()->write($rta);

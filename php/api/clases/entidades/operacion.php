@@ -3,10 +3,11 @@
 class Operacion{
     public $patente = null;
     public $color = null;
+    public $marca = null;
     public $foto = null;// Agregar path de foto por defecto   
-    public $id_empileado_ingreso = null;
+    public $id_empleado_ingreso = null;
     public $fecha_hora_ingreso = null;
-    public $id_empileado_salida = null;
+    public $id_empleado_salida = null;
     public $fecha_hora_salida = null;
     public $tiempo = null;
     public $importe = null;
@@ -58,29 +59,31 @@ class Operacion{
     */
     
     public function EstacionarVehiculo(){
-        date_default_timezone_set('America/Argentina/Buenos_Aires');
         
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
         //inserta enlazando parametros dela instancia
 		$consulta =$objetoAccesoDato->RetornarConsulta("INSERT INTO Operaciones (
             patente,
             color,
+            marca,
             foto,
             id_empleado_ingreso,
             fecha_hora_ingreso
             )values(
             :patente,
             :color,
+            :marca,
             :foto,
             :id_empleado_ingreso,
             :fecha_hora_ingreso
             )");
         
 		$consulta->bindValue(':patente',$this->patente, PDO::PARAM_STR);
-		$consulta->bindValue(':color', $this->foto, PDO::PARAM_STR);
+        $consulta->bindValue(':color', $this->color, PDO::PARAM_STR);
+        $consulta->bindValue(':marca', $this->marca, PDO::PARAM_STR);
         $consulta->bindValue(':foto', $this->foto, PDO::PARAM_STR);
         $consulta->bindValue(':id_empleado_ingreso', $this->id_empleado_ingreso, PDO::PARAM_INT);
-        $consulta->bindValue(':fecha_hora_ingreso', date("Y-m-d H:i:s e"), PDO::PARAM_STR);
+        $consulta->bindValue(':fecha_hora_ingreso', $this->fecha_hora_ingreso, PDO::PARAM_STR);
 		$consulta->execute();
 
 		return $objetoAccesoDato->RetornarUltimoidInsertado();
@@ -88,7 +91,7 @@ class Operacion{
     
     public static function SacarVehiculo($patente){
 
-        $unaOperacion = self::TraerUnaOperacion()
+        $unaOperacion = self::TraerUnaOperacion();
 
         $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
         $consulta =$objetoAccesoDato->RetornarConsulta("SELECT patente, color, foto, id_empleado_ingreso, fecha_hora_ingreso, id_empleado_salida, fecha_hora_salida, tiempo, importe FROM Operaciones WHERE patente=:patente AND fecha_hora_ingreso=:fecha_hora_ingreso");

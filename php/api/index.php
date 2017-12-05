@@ -6,9 +6,12 @@ require './vendor/autoload.php';
 require_once './clases/AccesoDatos.php';
 require_once './clases/entidades/pizzaApi.php';
 require_once './clases/entidades/empleadoApi.php';
+require_once './clases/entidades/operacionApi.php';
 require_once './clases/AutentificadorJWT.php';
 require_once './clases/middlewares/MWparaCORS.php';
 require_once './clases/middlewares/MWparaAutentificar.php';
+
+date_default_timezone_set('America/Argentina/Buenos_Aires');
 
 $config['displayErrorDetails'] = true;
 $config['addContentLengthHeader'] = false;

@@ -174,6 +174,7 @@ class empleadoApi extends Empleado implements IApiUsable{
 							
 							//Datos para el token
 							$datosEmpleado = array(
+								'id' => $unEmpleado->id,
 								'nombre' => $unEmpleado->nombre,
 								'mail' => $unEmpleado->mail,
 								'perfil' => $unEmpleado->perfil
