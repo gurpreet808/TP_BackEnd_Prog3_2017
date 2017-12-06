@@ -61,7 +61,7 @@ $app->group('/empleado', function () {
 $app->group('/vehiculo', function () {
   
   //Logueados
-  $this->get('/', \operacionApi::class . ':BuscarCocherasLibres')->add(\MWparaAutentificar::class . ':VerificarUsuario');
+  $this->get('/', \operacionApi::class . ':TraerTodos')->add(\MWparaAutentificar::class . ':VerificarUsuario');
   
   $this->get('/{patente}', \operacionApi::class . ':OperacionesVehiculo')->add(\MWparaAutentificar::class . ':VerificarUsuario');
   
@@ -69,7 +69,7 @@ $app->group('/vehiculo', function () {
   
   $this->post('/estacionar', \operacionApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
 
-  $this->post('/sacar', \operacionApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
+  $this->post('/sacar', \operacionApi::class . ':SacarUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
   
   //Administradores
   $this->delete('/', \operacionApi::class . ':BorrarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');

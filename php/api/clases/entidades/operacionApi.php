@@ -67,7 +67,7 @@ class operacionApi extends operacion implements IApiUsable{
       	$todasLasOperaciones = operacion::TraerTodasLasOperaciones();
      	$response = $response->withJson($todasLasOperaciones, 200);  
 		
-		 return $response;
+		return $response;
 	}
 
 	public function OperacionesVehiculo($request, $response, $args) {
@@ -170,6 +170,78 @@ class operacionApi extends operacion implements IApiUsable{
 							$rta = "No pudo estacionar el vehiculo";
 						}
 					}				
+				}
+			}	
+		}
+		$newResponse->getBody()->write($rta);
+
+        return $newResponse;
+	}
+	
+	public function SacarUno($request, $response, $args) {
+		$ArrayDeParametros = $request->getParsedBody();
+        //var_dump($ArrayDeParametros);
+
+		$newResponse = $response;
+
+		if ($ArrayDeParametros == null
+		or !array_key_exists('patente', $ArrayDeParametros)) {
+			$newResponse = $newResponse->withAddedHeader('alertType', "warning");
+			$rta = '<p>Ingrese todas la key "patente"</p>';
+		} else {
+			if ($ArrayDeParametros['patente']==null) {
+				$newResponse = $newResponse->withAddedHeader('alertType', "danger");
+				$rta = '<p>ERROR!! Ingrese los datos de la patente</p>';
+			}else {
+				$todasLasOperaciones = operacion::TraerOperacionesDeUnVehiculo($ArrayDeParametros['patente']);
+				$mioperacion = operacion::VehiculoEstacionado($ArrayDeParametros['patente']);
+				//var_dump($mioperacion);
+				
+				if (!$todasLasOperaciones or !$mioperacion) {
+					return $newResponse->getBody()->write('<p>ERROR!! Ese vehiculo no está estacionado');			
+				} else {					
+					
+
+					//Validar que el array que trae vehiculo estacionado no sea array vacío
+					$mioperacion = $mioperacion[0];
+	
+					$mioperacion->fecha_hora_salida=date("Y-m-d H:i:s");
+					$mioperacion->fecha_hora_salida="2017-12-05 21:37:48";
+						
+					//tomo el token del header
+					$arrayConToken = $request->getHeader('Authorization');
+					//var_dump($arrayConToken);
+					$token = "";
+					if (!empty($arrayConToken)) {
+						$token = $arrayConToken[0];			
+					}
+					$datos = autentificadorJWT::dataDelToken($token);
+					//var_dump($datos);	
+					$mioperacion->id_empleado_salida=$datos["id"];
+					
+					//calcular diferencia entre dates
+					if(!$mioperacion->CalcularHoras()){
+						$rta = "Error no se pudieron calcular las horas";
+						return $newResponse->getBody()->write($rta);
+					}
+					
+					var_dump($mioperacion);
+					echo "<br>DATOS OPERACION<br>";
+					var_dump($mioperacion->tiempo);
+					echo "<br>";
+					
+					//calcular importe
+					$mioperacion->importe=10;
+					
+					$newResponse = $newResponse->withAddedHeader('alertType', "success");
+
+					$rta = $mioperacion->SacarVehiculo();
+	
+					if ($rta) {
+						$rta = "Sacó el vehiculo";
+					} else {
+						$rta = "No pudo sacar el vehiculo";
+					}
 				}
 			}	
 		}

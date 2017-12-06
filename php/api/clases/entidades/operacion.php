@@ -62,6 +62,15 @@ class Operacion{
         return $cocheras;
     }
 
+    public static function VehiculoEstacionado($patente){
+        $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+        $consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM Operaciones WHERE patente=:patente AND fecha_hora_salida IS NULL");
+        $consulta->bindValue(':patente', $patente, PDO::PARAM_STR);
+        $consulta->execute();
+        
+        return $consulta->fetchAll(PDO::FETCH_CLASS, "Operacion");
+    }
+
     public function EstacionarVehiculo(){        
         
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
@@ -95,18 +104,22 @@ class Operacion{
         return $consulta->execute();
     }
     
-    public function SacarVehiculo($patente){
-
-        $unaOperacion = Operacion::TraerUnaOperacion();
+    public function SacarVehiculo(){
 
         $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-        $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE id_empleado_salida, fecha_hora_salida, tiempo, importe FROM Operaciones WHERE patente=:patente AND fecha_hora_ingreso IS NULL");
-        $consulta->bindValue(':patente',$patente, PDO::PARAM_STR);
-        $consulta->bindValue(':fecha_hora_ingreso',"", PDO::PARAM_STR);
-        $consulta->execute();
-        $OperacionBuscada = $consulta->fetchObject('Operacion');
+        $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE Operaciones SET 
+        `id_empleado_salida`=:id_empleado_salida,
+        `fecha_hora_salida`=:fecha_hora_salida,
+        `tiempo`=:tiempo 
+        WHERE `patente`=:patente AND `fecha_hora_salida` IS NULL");
         
-        return $OperacionBuscada;
+        $consulta->bindValue(':patente',$this->patente, PDO::PARAM_STR);
+        $consulta->bindValue(':id_empleado_salida',$this->id_empleado_salida, PDO::PARAM_INT);
+        $consulta->bindValue(':fecha_hora_salida',$this->fecha_hora_salida, PDO::PARAM_STR);
+        $consulta->bindValue(':tiempo',$this->tiempo, PDO::PARAM_INT);
+        //$consulta->bindValue(':importe',strval($this->importe), PDO::PARAM_STR);
+        
+        return $consulta->execute();
     }
 
     public static function TraerOperacionesDeUnVehiculo($patente){
@@ -172,15 +185,37 @@ class Operacion{
         return $OperacionBuscada;
     }
 
-    /*
-    public static function BorrarOperacionPorParametro($mail){
-        $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-		$consulta =$objetoAccesoDato->RetornarConsulta("DELETE FROM Operaciones WHERE mail=:mail");	
-		$consulta->bindValue(':mail',$mail, PDO::PARAM_STR);		
-		$consulta->execute();
-        
-        return $consulta->rowCount();
-    }*/
+    public function CalcularHoras(){
+        if ($this->fecha_hora_salida==null or $this->fecha_hora_ingreso == null) {
+            return false;
+        } else {
+            $salida = new DateTime($this->fecha_hora_salida);
+            $entrada = new DateTime($this->fecha_hora_ingreso);
+            $diferencia = $salida->diff($entrada);
+    
+            var_dump($diferencia);
+            
+            $d = $diferencia->days;
+            $h = $diferencia->h;
+            $m = $diferencia->i;
+            $s = $diferencia->s;
+            
+            if ($s>0) {
+                $m++;
+            }
+            if ($m>0) {
+                $h++;
+            }
+            if ($d>0) {
+                $h+=$d*24;
+            }
+            if ($d>0) {
+                $h+=$d*24;
+            }
 
+            $this->tiempo = $h;
+            return true;
+        }        
+    }
 }
 ?>
