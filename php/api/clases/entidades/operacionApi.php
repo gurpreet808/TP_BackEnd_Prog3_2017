@@ -191,14 +191,14 @@ class operacionApi extends operacion implements IApiUsable{
 		} else {
 			if ($ArrayDeParametros['patente']==null) {
 				$newResponse = $newResponse->withAddedHeader('alertType', "danger");
-				$rta = '<p>ERROR!! Ingrese los datos de la patente</p>';
+				$rta = '<p>ERROR!! Ingrese los datos de la patente.</p>';
 			}else {
 				$todasLasOperaciones = operacion::TraerOperacionesDeUnVehiculo($ArrayDeParametros['patente']);
 				$mioperacion = operacion::VehiculoEstacionado($ArrayDeParametros['patente']);
 				//var_dump($mioperacion);
 				
 				if (!$todasLasOperaciones or !$mioperacion) {
-					return $newResponse->getBody()->write('<p>ERROR!! Ese vehiculo no está estacionado');			
+					return $newResponse->getBody()->write('<p>ERROR!! Ese vehiculo no está estacionado.');			
 				} else {					
 					
 
@@ -220,27 +220,26 @@ class operacionApi extends operacion implements IApiUsable{
 					$mioperacion->id_empleado_salida=$datos["id"];
 					
 					//calcular diferencia entre dates
-					if(!$mioperacion->CalcularHoras()){
-						$rta = "Error no se pudieron calcular las horas";
-						return $newResponse->getBody()->write($rta);
+					if(!$mioperacion->CalcularImporte()){
+						return $newResponse->getBody()->write("ERROR!! no se pudo calcular el importe.");
 					}
-					
-					var_dump($mioperacion);
-					echo "<br>DATOS OPERACION<br>";
-					var_dump($mioperacion->tiempo);
-					echo "<br>";
-					
-					//calcular importe
-					$mioperacion->importe=10;
 					
 					$newResponse = $newResponse->withAddedHeader('alertType', "success");
 
 					$rta = $mioperacion->SacarVehiculo();
 	
 					if ($rta) {
-						$rta = "Sacó el vehiculo";
+						$rta = "Se retiró el vehículo.".
+						"<br><br>Patente: ".$mioperacion->patente.
+						"<br>Color: ".$mioperacion->color.
+						"<br>Marca: ".$mioperacion->marca.
+						"<br>Fecha y hora de ingreso: ".$mioperacion->fecha_hora_ingreso.
+						"<br>Fecha y hora de salida: ".$mioperacion->fecha_hora_salida.
+						"<br>Estadía (hs): ".$mioperacion->tiempo.
+						"<br>Cochera: ".$mioperacion->cochera.
+						"<br><br>IMPORTE: $".$mioperacion->importe;
 					} else {
-						$rta = "No pudo sacar el vehiculo";
+						$rta = "No pudo sacar el vehículo";
 					}
 				}
 			}	

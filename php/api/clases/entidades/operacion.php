@@ -4,6 +4,7 @@ class Operacion{
     public $patente = null;
     public $color = null;
     public $marca = null;
+    public $cochera = null;
     public $foto = null;// Agregar path de foto por defecto   
     public $id_empleado_ingreso = null;
     public $fecha_hora_ingreso = null;
@@ -108,16 +109,17 @@ class Operacion{
 
         $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
         $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE Operaciones SET 
-        `id_empleado_salida`=:id_empleado_salida,
-        `fecha_hora_salida`=:fecha_hora_salida,
-        `tiempo`=:tiempo 
-        WHERE `patente`=:patente AND `fecha_hora_salida` IS NULL");
+        id_empleado_salida=:id_empleado_salida,
+        fecha_hora_salida=:fecha_hora_salida,
+        tiempo=:tiempo,
+        importe=:importe  
+        WHERE patente=:patente AND fecha_hora_salida IS NULL");
         
         $consulta->bindValue(':patente',$this->patente, PDO::PARAM_STR);
         $consulta->bindValue(':id_empleado_salida',$this->id_empleado_salida, PDO::PARAM_INT);
         $consulta->bindValue(':fecha_hora_salida',$this->fecha_hora_salida, PDO::PARAM_STR);
         $consulta->bindValue(':tiempo',$this->tiempo, PDO::PARAM_INT);
-        //$consulta->bindValue(':importe',strval($this->importe), PDO::PARAM_STR);
+        $consulta->bindValue(':importe',$this->importe, PDO::PARAM_STR);
         
         return $consulta->execute();
     }
@@ -139,44 +141,10 @@ class Operacion{
         
         return $consulta->fetchAll(PDO::FETCH_CLASS, "Operacion");
     }
-    /*
-    public function GuardarOperacion(){
-        if(empty(Operacion::TraerUnOperacion($this->mail))){
-            $this->InsertarOperacion();
-            echo "Operacion guardado";
-        } else {
-            $elOperacion = Operacion::TraerUnOperacion($this->mail);
-            $this->id = $elOperacion->id;
-            
-            //un For que traiga todos los datos si están en NULL que no debería ser
-            if ($this->clave==null) {
-                $this->clave = $elOperacion->getClave();
-            }
-            
-            if ($this->ModificarOperacion()) {
-                echo "Operacion modificado";
-            } else {
-                echo "No modifico Operacion";
-            }
-        }
-    }
-    */
-
-    
-    /*public static function TraerUnVehiculoEstacionado($patente){
-		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT patente, color, foto, id_empleado_ingreso, fecha_hora_ingreso, id_empleado_salida, fecha_hora_salida, tiempo, importe FROM Operaciones WHERE patente=:patente AND fecha_hora_salida = null");
-        $consulta->bindValue(':patente',$patente, PDO::PARAM_STR);
-        $consulta->bindValue(':fecha_hora_ingreso',$fecha_hora_ingreso, PDO::PARAM_STR);
-        $consulta->execute();
-		$OperacionBuscada = $consulta->fetchObject('Operacion');
-        
-        return $OperacionBuscada;
-    }*/
 
     public static function TraerUnaOperacion($patente, $fecha_hora_ingreso){
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT patente, color, foto, id_empleado_ingreso, fecha_hora_ingreso, id_empleado_salida, fecha_hora_salida, tiempo, importe FROM Operaciones WHERE patente=:patente AND fecha_hora_ingreso=:fecha_hora_ingreso");
+		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM Operaciones WHERE patente=:patente AND fecha_hora_ingreso=:fecha_hora_ingreso");
         $consulta->bindValue(':patente',$patente, PDO::PARAM_STR);
         $consulta->bindValue(':fecha_hora_ingreso',$fecha_hora_ingreso, PDO::PARAM_STR);
         $consulta->execute();
@@ -193,7 +161,7 @@ class Operacion{
             $entrada = new DateTime($this->fecha_hora_ingreso);
             $diferencia = $salida->diff($entrada);
     
-            var_dump($diferencia);
+            //var_dump($diferencia);
             
             $d = $diferencia->days;
             $h = $diferencia->h;
@@ -216,6 +184,27 @@ class Operacion{
             $this->tiempo = $h;
             return true;
         }        
+    }
+
+    public function CalcularImporte(){
+        if($this->CalcularHoras()){
+            $hs = $this->tiempo;
+            $importe=0;
+            
+            if($hs<12){
+                $importe = $hs * 10;
+            }elseif ($hs>=24) {
+                $importe = $hs/24 * 170;
+            }else {
+                $importe = $hs/12 * 90;
+            }
+            
+            $this->importe=$importe;
+            
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 ?>
