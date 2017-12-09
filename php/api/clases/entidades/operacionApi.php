@@ -86,7 +86,8 @@ class operacionApi extends operacion implements IApiUsable{
 	public function BuscarCocherasLibres($request, $response, $args) {
 		//$todasLasOperaciones = operacion::TraerTodasLasOperaciones();
 		//$response = $response->withJson($todasLasOperaciones, 200);  
-		
+		var_dump(operacion::CocherasLibres());
+
 		return operacion::CocherasLibres();
 	}
 	

@@ -60,6 +60,8 @@ $app->group('/empleado', function () {
 /*Operaciones*/
 $app->group('/vehiculo', function () {
   
+  $this->get('/cocheras', \operacionApi::class . ':BuscarCocherasLibres');
+
   //Logueados
   $this->get('/', \operacionApi::class . ':TraerTodos')->add(\MWparaAutentificar::class . ':VerificarUsuario');
   

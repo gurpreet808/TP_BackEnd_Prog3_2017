@@ -12,7 +12,7 @@ class autentificadorJWT
         
         $payload = array(
             'iat' => $ahora, 
-            'exp' => $ahora+60*2,
+            'exp' => $ahora+60*15,
             'aud' => self::Aud(), 
             'data' => $datos
             );
