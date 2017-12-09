@@ -132,44 +132,55 @@ class operacionApi extends operacion implements IApiUsable{
 						return $newResponse->getBody()->write('<p>ERROR!! Ese vehiculo ya está estacionado en '."cochera".'.</p>');			
 					} else {
 						
-						operacion::CocherasLibres();
-						
-						$mioperacion = new operacion();
-						
-						$mioperacion->patente=$ArrayDeParametros['patente'];
-						$mioperacion->color=$ArrayDeParametros['color'];
-						$mioperacion->marca=$ArrayDeParametros['marca'];
-						$mioperacion->fecha_hora_ingreso=date("Y-m-d H:i:s");
-	
-						$mioperacion->cochera=1;
-		
-						//extraer del token el ID
-		
-						//tomo el token del header
-						$arrayConToken = $request->getHeader('Authorization');
-						//var_dump($arrayConToken);
-						
-						$token = "";
-		
-						if (!empty($arrayConToken)) {
-							$token = $arrayConToken[0];			
-						}
-		
-						$datos = autentificadorJWT::dataDelToken($token);
-		
-						//var_dump($datos);
-		
-						$mioperacion->id_empleado_ingreso=$datos["id"];
-						
-						$newResponse = $newResponse->withAddedHeader('alertType', "success");
-		
-						$rta = $mioperacion->EstacionarVehiculo();
-		
-						if ($rta) {
-							$rta = "Estacionó el vehiculo";
+						$libres = operacion::CocherasLibres();
+						if (empty($libres)) {
+							return $newResponse->getBody()->write('<p>ERROR!! No hay más lugar en el estacionamiento.</p>');
 						} else {
-							$rta = "No pudo estacionar el vehiculo";
+							if ($ArrayDeParametros['discapacitado_embarazada']=="si") {
+								echo "Es discapacitado";
+							} else {
+								echo "NO es discapacitado";
+							}
+							
+							$mioperacion = new operacion();
+							
+							$mioperacion->patente=$ArrayDeParametros['patente'];
+							$mioperacion->color=$ArrayDeParametros['color'];
+							$mioperacion->marca=$ArrayDeParametros['marca'];
+							$mioperacion->fecha_hora_ingreso=date("Y-m-d H:i:s");
+							
+							//cohera random
+							$mioperacion->cochera = $libres[array_rand($libres, 1)];
+
+			
+							//tomo el token del header para ID empleado
+							$arrayConToken = $request->getHeader('Authorization');
+							//var_dump($arrayConToken);
+							
+							$token = "";
+			
+							if (!empty($arrayConToken)) {
+								$token = $arrayConToken[0];			
+							}
+			
+							$datos = autentificadorJWT::dataDelToken($token);
+			
+							//var_dump($datos);
+			
+							$mioperacion->id_empleado_ingreso=$datos["id"];
+							
+							$newResponse = $newResponse->withAddedHeader('alertType', "success");
+			
+							$rta = $mioperacion->EstacionarVehiculo();
+			
+							if ($rta) {
+								$rta = "Estacionó el vehiculo";
+							} else {
+								$rta = "No pudo estacionar el vehiculo";
+							}
 						}
+						
+						
 					}				
 				}
 			}	
