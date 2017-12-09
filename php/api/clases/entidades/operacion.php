@@ -41,14 +41,35 @@ class Operacion{
         return $consulta->rowCount();
     }
 
-    public static function CocherasLibres(){
+    public static function CocherasLibres($opt){
         $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-        $consulta =$objetoAccesoDato->RetornarConsulta("SELECT `id_cochera` FROM `cocheras` 
+        /*$consulta = $objetoAccesoDato->RetornarConsulta("SELECT `id_cochera` FROM `cocheras` 
         WHERE `id_cochera` NOT IN (
             SELECT  `cochera`
             FROM    `operaciones`
             WHERE   `fecha_hora_salida` IS NULL
-        )");
+        ) AND `especial` IS NULL");*/
+        $consultaSQL = "SELECT `id_cochera` FROM `cocheras` 
+        WHERE `id_cochera` NOT IN (
+            SELECT  `cochera`
+            FROM    `operaciones`
+            WHERE   `fecha_hora_salida` IS NULL
+        ) ";
+        switch ($opt) {
+            case 'no':
+                $consultaSQL = $consultaSQL."AND `especial` IS NULL";
+                break;
+            
+            case 'si':
+                $consultaSQL = $consultaSQL."AND `especial` = 'si'";
+                break;
+
+            default:
+                # code...
+                break;
+        }
+        $consulta = $objetoAccesoDato->RetornarConsulta($consultaSQL);
+
         $consulta->execute();
         
         $cocheras = array();

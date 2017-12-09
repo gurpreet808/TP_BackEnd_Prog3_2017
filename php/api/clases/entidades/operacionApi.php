@@ -132,15 +132,16 @@ class operacionApi extends operacion implements IApiUsable{
 						return $newResponse->getBody()->write('<p>ERROR!! Ese vehiculo ya está estacionado en '."cochera".'.</p>');			
 					} else {
 						
-						$libres = operacion::CocherasLibres();
+						$libres = operacion::CocherasLibres($ArrayDeParametros['discapacitado_embarazada']);
 						if (empty($libres)) {
-							return $newResponse->getBody()->write('<p>ERROR!! No hay más lugar en el estacionamiento.</p>');
-						} else {
+							$rta = '<p>ERROR!! No hay más lugar en el estacionamiento';
 							if ($ArrayDeParametros['discapacitado_embarazada']=="si") {
-								echo "Es discapacitado";
+								$rta = $rta.' para discapacitados. Puede consultarle al cliente si desea un lugar que no está reservado para embarazadas o discapacitados.</p>';
 							} else {
-								echo "NO es discapacitado";
+								$rta = $rta.'.</p>';
 							}
+							return $newResponse->getBody()->write($rta);
+						} else {
 							
 							$mioperacion = new operacion();
 							
