@@ -174,6 +174,16 @@ class Operacion{
         return $OperacionBuscada;
     }
 
+    public static function TraerOperacionesDeUnEmpleado($unId){        
+		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
+		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM `operaciones` WHERE `id_empleado_ingreso` = :id OR `id_empleado_salida` = :id");
+        $consulta->bindValue(':id',$unId, PDO::PARAM_STR);
+        
+        $consulta->execute();
+
+        return $consulta->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public static function NombreCochera($id_cochera){
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
 		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT nombre FROM cocheras WHERE id_cochera = :id_cochera");
@@ -184,6 +194,15 @@ class Operacion{
         $rdo_consulta = str_split($rdo_consulta[0]["nombre"]);
 
         return "Piso ".$rdo_consulta[0]." Sección ".$rdo_consulta[1];
+    }
+
+    public static function UsarCochera($id_cochera){
+
+		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+		$consulta =$objetoAccesoDato->RetornarConsulta("UPDATE cocheras SET usos = usos+1 WHERE id_cochera = :id_cochera");
+		$consulta->bindValue(':id_cochera',$id_cochera, PDO::PARAM_STR);
+
+        return $consulta->execute();
     }
 
     public function CalcularHoras(){

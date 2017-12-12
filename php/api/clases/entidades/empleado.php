@@ -220,7 +220,7 @@ class Empleado{
         return $consulta->execute();
     }
 
-    public function TraerLogueos(){        
+    public static function TraerLogueos(){        
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
         //inserta enlazando parametros dela instancia
 		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT 
@@ -239,9 +239,8 @@ class Empleado{
         return $consulta->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function TraerLogueosDeUnEmpleado($mail){        
+    public static function TraerLogueosDeUnEmpleado($mail){        
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
-        //inserta enlazando parametros dela instancia
 		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT 
         i.`fecha_hora_ingreso`,
         e.`id`,
