@@ -29,10 +29,12 @@ class operacionApi extends operacion implements IApiUsable{
 				`tiempo` INT,
 				`importe` FLOAT, 
 				PRIMARY KEY (`patente`,`fecha_hora_ingreso`),
-    			FOREIGN KEY (`id_empleado_ingreso`) REFERENCES `empleados`(`id`),
-				FOREIGN KEY (`id_empleado_salida`) REFERENCES `empleados`(`id`),
 				FOREIGN KEY (`cochera`) REFERENCES `cocheras`(`id_cochera`)
 			)");
+			/*
+    			FOREIGN KEY (`id_empleado_ingreso`) REFERENCES `empleados`(`id`),
+				FOREIGN KEY (`id_empleado_salida`) REFERENCES `empleados`(`id`),
+			*/
 			
 			$newResponse->getBody()->write($consulta->execute());
 		}
@@ -42,10 +44,23 @@ class operacionApi extends operacion implements IApiUsable{
 	/*
 	public function LlenarBBDD(){
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
-		$consulta =$objetoAccesoDato->RetornarConsulta("INSERT INTO operaciones (nombre,apellido,clave,mail,turno,perfil,fecha_creacion)
-	 		values
-			 ('Administrador','Administrator','admin','admin@admin.com','mañana','admin','15/11/16'), 
-			 ('operacion','User','user','user@user.com','tarde','user','24/12/16')");
+		$consulta =$objetoAccesoDato->RetornarConsulta("INSERT INTO `operaciones` (`patente`, `color`, `marca`, `cochera`, `id_empleado_ingreso`, `fecha_hora_ingreso`, `id_empleado_salida`, `fecha_hora_salida`, `tiempo`, `importe`) VALUES
+		('AAA111', 'Azul', 'Fiat', 5, 2, '2017-10-01 11:46:24', NULL, NULL, NULL, NULL),
+		('AAA222', 'Negro', 'Peugeot', 6, 2, '2017-10-01 12:32:44', NULL, NULL, NULL, NULL),
+		('AAA333', 'Verde', 'Citroen', 1, 2, '2017-10-01 12:36:54', NULL, NULL, NULL, NULL),
+		('AAA444', 'Blanco', 'Volkswagen', 2, 3, '2017-10-02 15:47:41', NULL, NULL, NULL, NULL),
+		('AAA555', 'Rojo', 'Renault', 3, 2, '2017-10-02 12:43:46', NULL, NULL, NULL, NULL),
+		('AAA666', 'Gris', 'Hyundai', 21, 4, '2017-10-02 21:47:59', NULL, NULL, NULL, NULL),
+		('AAA777', 'Dorado', 'Porsche', 11, 2, '2017-10-03 08:18:22', NULL, NULL, NULL, NULL),
+		('AAA888', 'Azul', 'Mitsubishi', 15, 2, '2017-10-03 10:48:27', NULL, NULL, NULL, NULL),
+		('AAA999', 'Amarillo', 'Subaru', 8, 3, '2017-10-03 13:21:31', NULL, NULL, NULL, NULL),
+		('BBB111', 'Gris', 'Toyota', 12, 2, '2017-10-04 09:48:40', NULL, NULL, NULL, NULL),
+		('BBB222', 'Negro', 'Ford', 4, 2, '2017-10-04 12:38:44', NULL, NULL, NULL, NULL),
+		('BBB333', 'Blanco', 'Chevrolet', 18, 4, '2017-11-12 22:48:48', NULL, NULL, NULL, NULL),
+		('BBB444', 'Azul', 'Honda', 17, 2, '2017-11-12 10:28:57', NULL, NULL, NULL, NULL),
+		('BBB555', 'Rojo', 'Mazda', 7, 2, '2017-12-10 09:49:03', NULL, NULL, NULL, NULL),
+		('BBB666', 'Verde', 'Dodge', 16, 2, '2017-12-11 10:19:08', NULL, NULL, NULL, NULL),
+		('BBB777', 'Amarillo', 'Jeep', 19, 3, '2017-12-12 15:32:22', NULL, NULL, NULL, NULL)");
 	
 		return $consulta->execute();
 	}*/
@@ -212,14 +227,11 @@ class operacionApi extends operacion implements IApiUsable{
 				
 				if (!$todasLasOperaciones or !$mioperacion) {
 					return $newResponse->getBody()->write('<p>ERROR!! Ese vehiculo no está estacionado.');			
-				} else {					
-					
-
-					//Validar que el array que trae vehiculo estacionado no sea array vacío
+				} else {
 					$mioperacion = $mioperacion[0];
 	
 					$mioperacion->fecha_hora_salida=date("Y-m-d H:i:s");
-					$mioperacion->fecha_hora_salida="2017-12-05 21:37:48";
+					//$mioperacion->fecha_hora_salida="2017-12-05 21:37:48";
 						
 					//tomo el token del header
 					$arrayConToken = $request->getHeader('Authorization');

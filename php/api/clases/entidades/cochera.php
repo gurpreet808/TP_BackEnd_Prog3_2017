@@ -3,27 +3,27 @@
 class Cochera
 {
     public $id_cochera;
-    public $piso;
+    public $nombre;
     public $especial;
 
-    public function BorrarCochera(){
-	 	$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-		//lo borra mediante el ID de la instancia que se creó
-        $consulta =$objetoAccesoDato->RetornarConsulta("DELETE FROM cocheras WHERE id_cochera=:id_cochera");
-        $consulta->bindValue(':id_cochera',$this->id_cochera, PDO::PARAM_INT);
+    public static function BorrarCochera($id){
+	 	$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
+        $consulta = $objetoAccesoDato->RetornarConsulta("DELETE FROM cocheras WHERE id_cochera=:id_cochera");
+        $consulta->bindValue(':id_cochera',$id, PDO::PARAM_INT);
         $consulta->execute();
+
         return $consulta->rowCount();
     }
     
     public function ModificarCochera(){
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
 		$consulta =$objetoAccesoDato->RetornarConsulta("UPDATE cocheras SET 
-        piso=:piso, 
+        nombre=:nombre, 
         especial=:especial
         WHERE id_cochera=:id_cochera");
 
 		$consulta->bindValue(':id_cochera',$this->id_cochera, PDO::PARAM_INT);
-		$consulta->bindValue(':piso',$this->piso, PDO::PARAM_STR);
+		$consulta->bindValue(':nombre',$this->nombre, PDO::PARAM_STR);
 		$consulta->bindValue(':especial', $this->especial, PDO::PARAM_STR);
 
 		return $consulta->execute();
@@ -33,10 +33,10 @@ class Cochera
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
 
 		$consulta =$objetoAccesoDato->RetornarConsulta("INSERT INTO cocheras 
-        (piso, especial)
-        VALUES (:piso, :especial)");
+        (nombre, especial)
+        VALUES (:nombre, :especial)");
         
-        $consulta->bindValue(':piso',$this->piso, PDO::PARAM_STR);
+        $consulta->bindValue(':nombre',$this->nombre, PDO::PARAM_STR);
         $consulta->bindValue(':especial',$this->especial, PDO::PARAM_STR);
 
 		$consulta->execute();
@@ -44,7 +44,7 @@ class Cochera
 		return $objetoAccesoDato->RetornarUltimoidInsertado();
     }
     
-    public static function TraerTodosLasCocheras(){
+    public static function TraerTodasLasCocheras(){
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
 		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM cocheras");
 		$consulta->execute();			

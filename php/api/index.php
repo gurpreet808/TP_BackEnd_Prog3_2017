@@ -5,6 +5,7 @@ use \Psr\Http\Message\ResponseInterface as Response;
 require './vendor/autoload.php';
 require_once './clases/AccesoDatos.php';
 require_once './clases/entidades/pizzaApi.php';
+require_once './clases/entidades/cocheraApi.php';
 require_once './clases/entidades/empleadoApi.php';
 require_once './clases/entidades/operacionApi.php';
 require_once './clases/AutentificadorJWT.php';
@@ -43,12 +44,12 @@ $app->group('/empleado', function () {
   
   $this->get('/{mail}', \empleadoApi::class . ':traerUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
 
-  $this->post('/modificarme', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
+  //$this->post('/modificarme', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
 
   //Administradores
-  $this->post('/logueos/{mail}', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');  
+  //$this->post('/logueos/{mail}', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');  
 
-  $this->post('/operaciones/{mail}', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');    
+  //$this->post('/operaciones/{mail}', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');    
 
   $this->post('/', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');
 
@@ -78,6 +79,24 @@ $app->group('/vehiculo', function () {
   
   $this->put('/', \operacionApi::class . ':ModificarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');
 });
+
+/*cochera*/
+$app->group('/cochera', function () {
+  
+    //Públicos
+    
+    //Administradores
+    $this->get('/', \cocheraApi::class . ':traerTodos');
+    
+    $this->get('/{id}', \cocheraApi::class . ':traerUno');
+    
+    $this->post('/', \cocheraApi::class . ':CargarUno');
+  
+    $this->delete('/', \cocheraApi::class . ':BorrarUno');
+   
+    $this->put('/', \cocheraApi::class . ':ModificarUno');
+
+  })->add(\MWparaAutentificar::class . ':VerificarAdmin');
 
 /*Pizza*/
 $app->group('/pizza', function () {
