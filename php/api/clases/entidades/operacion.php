@@ -33,7 +33,7 @@ class Operacion{
     public function BorrarOperacion(){
 	 	$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
 		//lo borra mediante el ID de la instancia que se creó
-        $consulta =$objetoAccesoDato->RetornarConsulta("DELETE FROM Operaciones WHERE patente=:patente AND fecha_hora_ingreso=:fecha_hora_ingreso");
+        $consulta =$objetoAccesoDato->RetornarConsulta("DELETE FROM operaciones WHERE patente=:patente AND fecha_hora_ingreso=:fecha_hora_ingreso");
         $consulta->bindValue(':patente',$this->patente, PDO::PARAM_STR);
         $consulta->bindValue(':fecha_hora_ingreso',$this->fecha_hora_ingreso, PDO::PARAM_STR);
         $consulta->execute();
@@ -86,7 +86,7 @@ class Operacion{
 
     public static function VehiculoEstacionado($patente){
         $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-        $consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM Operaciones WHERE patente=:patente AND fecha_hora_salida IS NULL");
+        $consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM operaciones WHERE patente=:patente AND fecha_hora_salida IS NULL");
         $consulta->bindValue(':patente', $patente, PDO::PARAM_STR);
         $consulta->execute();
         
@@ -97,7 +97,7 @@ class Operacion{
         
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
         //inserta enlazando parametros dela instancia
-		$consulta = $objetoAccesoDato->RetornarConsulta("INSERT INTO Operaciones (
+		$consulta = $objetoAccesoDato->RetornarConsulta("INSERT INTO operaciones (
             patente,
             color,
             marca,
@@ -129,7 +129,7 @@ class Operacion{
     public function SacarVehiculo(){
 
         $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-        $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE Operaciones SET 
+        $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE operaciones SET 
         id_empleado_salida=:id_empleado_salida,
         fecha_hora_salida=:fecha_hora_salida,
         tiempo=:tiempo,
@@ -148,7 +148,7 @@ class Operacion{
     public static function TraerOperacionesDeUnVehiculo($patente){
         
         $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-        $consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM Operaciones WHERE patente=:patente");
+        $consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM operaciones WHERE patente=:patente");
         $consulta->bindValue(':patente', $patente, PDO::PARAM_STR);
         $consulta->execute();
         
@@ -157,7 +157,7 @@ class Operacion{
     
     public static function TraerTodasLasOperaciones(){
         $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-        $consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM Operaciones");
+        $consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM operaciones");
         $consulta->execute();			
         
         return $consulta->fetchAll(PDO::FETCH_CLASS, "Operacion");
@@ -165,7 +165,7 @@ class Operacion{
 
     public static function TraerUnaOperacion($patente, $fecha_hora_ingreso){
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM Operaciones WHERE patente=:patente AND fecha_hora_ingreso=:fecha_hora_ingreso");
+		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM operaciones WHERE patente=:patente AND fecha_hora_ingreso=:fecha_hora_ingreso");
         $consulta->bindValue(':patente',$patente, PDO::PARAM_STR);
         $consulta->bindValue(':fecha_hora_ingreso',$fecha_hora_ingreso, PDO::PARAM_STR);
         $consulta->execute();

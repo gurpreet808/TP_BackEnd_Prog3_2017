@@ -38,8 +38,10 @@ class empleadoApi extends Empleado implements IApiUsable{
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
 		$consulta =$objetoAccesoDato->RetornarConsulta("INSERT INTO empleados (nombre,apellido,clave,mail,turno,perfil,fecha_creacion)
 	 		values
-			 ('Administrador','Administrator','admin','admin@admin.com','mañana','admin','15/11/16'), 
-			 ('Empleado','User','user','user@user.com','tarde','user','24/12/16')");
+			 ('Administrador','Administrator','admin','admin@admin.com','mañana','administrador','2017-11-15 21:25:08'), 
+			 ('Martin','Garcia','martin','martin@martin.com','mañana','usuario','2017-12-01 12:03:17'),
+			 ('Gisela','Diaz','gisela','gisela@gisela.com','tarde','usuario','2017-12-01 12:03:55'),
+			 ('Diego','Lopez','diego','diego@diego.com','noche','usuario','2017-12-01 12:04:21')");
 	
 		return $consulta->execute();
 	}
@@ -290,7 +292,7 @@ class empleadoApi extends Empleado implements IApiUsable{
 				
 				$array_mail = self::comprobar_key("mail", $ArrayDeParametros);
 				if ($array_mail["esValido"]) {
-					if (!empty(Empleado::TraerUnEmpleado($ArrayDeParametros['mail'])) && (Empleado::TraerUnEmpleado($ArrayDeParametros['mail']))->id != $miempleado->id) {
+					if (!empty(Empleado::TraerUnEmpleado($ArrayDeParametros['mail'])) && empleado::TraerUnEmpleado($ArrayDeParametros['mail'])->id != $miempleado->id) {
 						return $newResponse->getBody()->write('<p>ERROR!! Ese mail ya está registrado.</p>');
 					}
 

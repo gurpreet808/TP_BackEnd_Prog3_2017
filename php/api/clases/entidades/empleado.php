@@ -38,7 +38,7 @@ class Empleado{
     
     public function BorrarEmpleado(){
 	 	$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
-        $consulta =$objetoAccesoDato->RetornarConsulta("DELETE FROM Empleados WHERE id=:id");
+        $consulta =$objetoAccesoDato->RetornarConsulta("DELETE FROM empleados WHERE id=:id");
         $consulta->bindValue(':id',$this->id, PDO::PARAM_INT);
         $consulta->execute();
         
@@ -50,7 +50,7 @@ class Empleado{
     public function BorrarEmpleado(){
         $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
        //lo borra mediante el ID de la instancia que se creó
-       $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE Empleados SET 
+       $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE empleados SET 
        perfil='borrado'
        WHERE id=:id");
        $consulta->bindValue(':id',$this->id, PDO::PARAM_INT);
@@ -62,7 +62,7 @@ class Empleado{
     public function ModificarEmpleado(){
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
         //modifica enlazando parametros de la instncia
-		$consulta = $objetoAccesoDato->RetornarConsulta("UPDATE Empleados SET 
+		$consulta = $objetoAccesoDato->RetornarConsulta("UPDATE empleados SET 
         nombre=:nombre, 
         apellido=:apellido,
         clave=:clave, 
@@ -89,7 +89,7 @@ class Empleado{
     public function InsertarEmpleado(){
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
         //inserta enlazando parametros dela instancia
-		$consulta =$objetoAccesoDato->RetornarConsulta("INSERT INTO Empleados (
+		$consulta =$objetoAccesoDato->RetornarConsulta("INSERT INTO empleados (
             nombre,
             apellido,
             clave,
@@ -145,35 +145,35 @@ class Empleado{
     
     public static function TraerTodosLosEmpleados(){
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT id, nombre, apellido, clave, mail, turno, perfil, fecha_creacion, foto FROM Empleados");
+		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT id, nombre, apellido, clave, mail, turno, perfil, fecha_creacion, foto FROM empleados");
 		$consulta->execute();			
         
-        return $consulta->fetchAll(PDO::FETCH_CLASS, "Empleado");
+        return $consulta->fetchAll(PDO::FETCH_CLASS, "empleado");
     }
     
     public static function TraerUnEmpleado($mail){
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT id, nombre, apellido, clave, mail, turno, perfil, fecha_creacion, foto FROM Empleados where mail = :mail");
+		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT id, nombre, apellido, clave, mail, turno, perfil, fecha_creacion, foto FROM empleados where mail = :mail");
 		$consulta->bindValue(':mail',$mail, PDO::PARAM_STR);
         $consulta->execute();
-		$EmpleadoBuscado= $consulta->fetchObject('Empleado');
+		$EmpleadoBuscado= $consulta->fetchObject('empleado');
         
         return $EmpleadoBuscado;
     }
 
     public static function TraerUnEmpleadoPorId($id){
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT id, nombre, apellido, clave, mail, turno, perfil, fecha_creacion, foto FROM Empleados where id = :id");
+		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT id, nombre, apellido, clave, mail, turno, perfil, fecha_creacion, foto FROM empleados where id = :id");
 		$consulta->bindValue(':id',$id, PDO::PARAM_INT);
         $consulta->execute();
-		$EmpleadoBuscado= $consulta->fetchObject('Empleado');
+		$EmpleadoBuscado= $consulta->fetchObject('empleado');
         
         return $EmpleadoBuscado;
     }
 
     public static function BorrarEmpleadoPorParametro($mail){
         $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-		$consulta =$objetoAccesoDato->RetornarConsulta("DELETE FROM Empleados WHERE mail=:mail");	
+		$consulta =$objetoAccesoDato->RetornarConsulta("DELETE FROM empleados WHERE mail=:mail");	
 		$consulta->bindValue(':mail',$mail, PDO::PARAM_STR);		
 		$consulta->execute();
         
@@ -181,7 +181,7 @@ class Empleado{
     }
 
     public static function VerificarClave($mail, $clave){
-        if(empty(self::TraerUnEmpleado($mail)) or (self::TraerUnEmpleado($mail))->perfil == "borrado"){
+        if(empty(self::TraerUnEmpleado($mail)) or self::TraerUnEmpleado($mail)->perfil == "borrado"){
             return "NO_MAIL";
         } else {
             $unEmpleado = self::TraerUnEmpleado($mail);
