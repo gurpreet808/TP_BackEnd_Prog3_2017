@@ -178,10 +178,9 @@ class operacionApi extends operacion implements IApiUsable{
 							//cohera random
 							$mioperacion->cochera = $libres[array_rand($libres, 1)];
 							
-							/*
-							if(operacion::UsarCochera($mioperacion->cochera)){
+							if(!operacion::UsarCochera($mioperacion->cochera)){
 								return $newResponse->getBody()->write("<p>ERROR!! No se pudo contar el uso.</p>");
-							}*/
+							}
 			
 							//tomo el token del header para ID empleado
 							$arrayConToken = $request->getHeader('Authorization');

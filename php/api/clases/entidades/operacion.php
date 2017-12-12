@@ -197,10 +197,9 @@ class Operacion{
     }
 
     public static function UsarCochera($id_cochera){
-
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
 		$consulta =$objetoAccesoDato->RetornarConsulta("UPDATE cocheras SET usos = usos+1 WHERE id_cochera = :id_cochera");
-		$consulta->bindValue(':id_cochera',$id_cochera, PDO::PARAM_STR);
+		$consulta->bindValue(':id_cochera',$id_cochera, PDO::PARAM_INT);
 
         return $consulta->execute();
     }
