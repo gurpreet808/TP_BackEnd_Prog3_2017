@@ -2,16 +2,15 @@
 
 class Cochera
 {
-    public $idCochera;
+    public $id_cochera;
     public $piso;
-    public $patente;
-    public $contUsos = 0;
+    public $especial;
 
     public function BorrarCochera(){
 	 	$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
 		//lo borra mediante el ID de la instancia que se creó
-        $consulta =$objetoAccesoDato->RetornarConsulta("DELETE FROM cocheras WHERE idCochera=:idCochera");
-        $consulta->bindValue(':idCochera',$this->idCochera, PDO::PARAM_INT);
+        $consulta =$objetoAccesoDato->RetornarConsulta("DELETE FROM cocheras WHERE id_cochera=:id_cochera");
+        $consulta->bindValue(':id_cochera',$this->id_cochera, PDO::PARAM_INT);
         $consulta->execute();
         return $consulta->rowCount();
     }
@@ -20,14 +19,12 @@ class Cochera
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
 		$consulta =$objetoAccesoDato->RetornarConsulta("UPDATE cocheras SET 
         piso=:piso, 
-        patente=:patente,
-        contUsos=:contUsos
-        WHERE idCochera=:idCochera");
+        especial=:especial
+        WHERE id_cochera=:id_cochera");
 
-		$consulta->bindValue(':idCochera',$this->idCochera, PDO::PARAM_INT);
+		$consulta->bindValue(':id_cochera',$this->id_cochera, PDO::PARAM_INT);
 		$consulta->bindValue(':piso',$this->piso, PDO::PARAM_STR);
-		$consulta->bindValue(':patente', $this->patente, PDO::PARAM_STR);
-        $consulta->bindValue(':contUsos', $this->contUsos, PDO::PARAM_INT);
+		$consulta->bindValue(':especial', $this->especial, PDO::PARAM_STR);
 
 		return $consulta->execute();
     }
@@ -36,10 +33,12 @@ class Cochera
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
 
 		$consulta =$objetoAccesoDato->RetornarConsulta("INSERT INTO cocheras 
-        (piso)
-        VALUES (:piso)");
+        (piso, especial)
+        VALUES (:piso, :especial)");
         
-		$consulta->bindValue(':piso',$this->piso, PDO::PARAM_STR);
+        $consulta->bindValue(':piso',$this->piso, PDO::PARAM_STR);
+        $consulta->bindValue(':especial',$this->especial, PDO::PARAM_STR);
+
 		$consulta->execute();
 
 		return $objetoAccesoDato->RetornarUltimoidInsertado();
@@ -47,36 +46,18 @@ class Cochera
     
     public static function TraerTodosLasCocheras(){
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT idCochera, piso, patente, contUsos FROM cocheras");
+		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM cocheras");
 		$consulta->execute();			
 		return $consulta->fetchAll(PDO::FETCH_CLASS, "cochera");
     }
     
-    public static function TraerUnaCochera($piso){
+    public static function TraerUnaCochera($id_cochera){
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT idCochera, piso, patente, contUsos FROM cocheras WHERE piso = :piso");
-		$consulta->bindValue(':piso',$piso, PDO::PARAM_STR);
+		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM cocheras WHERE id_cochera = :id_cochera");
+		$consulta->bindValue(':id_cochera',$id_cochera, PDO::PARAM_STR);
         $consulta->execute();
 		$cocheraBuscado= $consulta->fetchObject('cochera');
 		return $cocheraBuscado;
-    }
-
-    public static function BorrarCocheraPorParametro($piso){
-        $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-		$consulta =$objetoAccesoDato->RetornarConsulta("DELETE FROM cocheras WHERE piso = :piso");	
-		$consulta->bindValue(':piso',$piso, PDO::PARAM_STR);		
-		$consulta->execute();
-		return $consulta->rowCount();
-    }
-    
-    public static function CargarVehiculoEnCochera($quePiso, $unaPatente){
-		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
-        $unaCochera = Cochera::TraerUnaCochera($quePiso);
-
-        $unaCochera->patente = $unaPatente;
-        $unaCochera->contUsos++;
-        
-		return $unaCochera->ModificarCochera();
     }
 }
 ?>

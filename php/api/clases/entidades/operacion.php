@@ -174,6 +174,18 @@ class Operacion{
         return $OperacionBuscada;
     }
 
+    public static function NombreCochera($id_cochera){
+		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT piso FROM cocheras WHERE id_cochera = :id_cochera");
+		$consulta->bindValue(':id_cochera',$id_cochera, PDO::PARAM_STR);
+        $consulta->execute();
+        $rdo_consulta = $consulta->fetchAll(PDO::FETCH_ASSOC);      
+
+        $rdo_consulta = str_split($rdo_consulta[0]["piso"]);
+
+        return "Piso ".$rdo_consulta[0]." Sección ".$rdo_consulta[1];
+    }
+
     public function CalcularHoras(){
         if ($this->fecha_hora_salida==null or $this->fecha_hora_ingreso == null) {
             return false;

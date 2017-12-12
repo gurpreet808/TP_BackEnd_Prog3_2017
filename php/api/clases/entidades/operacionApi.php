@@ -136,7 +136,7 @@ class operacionApi extends operacion implements IApiUsable{
 						if (empty($libres)) {
 							$rta = '<p>ERROR!! No hay más lugar en el estacionamiento';
 							if ($ArrayDeParametros['discapacitado_embarazada']=="si") {
-								$rta = $rta.' para discapacitados. Puede consultarle al cliente si desea un lugar que no está reservado para embarazadas o discapacitados.</p>';
+								$rta = $rta.' para discapacitados.</p><p>Puede consultarle al cliente si desea un lugar que no está reservado para embarazadas o discapacitados.</p>';
 							} else {
 								$rta = $rta.'.</p>';
 							}
@@ -240,6 +240,8 @@ class operacionApi extends operacion implements IApiUsable{
 					$newResponse = $newResponse->withAddedHeader('alertType', "success");
 
 					$rta = $mioperacion->SacarVehiculo();
+
+					$nombre_cochera = operacion::NombreCochera($mioperacion->cochera);
 	
 					if ($rta) {
 						$rta = "Se retiró el vehículo.".
@@ -249,7 +251,7 @@ class operacionApi extends operacion implements IApiUsable{
 						"<br>Fecha y hora de ingreso: ".$mioperacion->fecha_hora_ingreso.
 						"<br>Fecha y hora de salida: ".$mioperacion->fecha_hora_salida.
 						"<br>Estadía (hs): ".$mioperacion->tiempo.
-						"<br>Cochera: ".$mioperacion->cochera.
+						"<br>Cochera: ".$nombre_cochera.
 						"<br><br>IMPORTE: $".$mioperacion->importe;
 					} else {
 						$rta = "No pudo sacar el vehículo";
