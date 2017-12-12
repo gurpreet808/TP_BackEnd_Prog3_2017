@@ -176,12 +176,12 @@ class Operacion{
 
     public static function NombreCochera($id_cochera){
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT piso FROM cocheras WHERE id_cochera = :id_cochera");
+		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT nombre FROM cocheras WHERE id_cochera = :id_cochera");
 		$consulta->bindValue(':id_cochera',$id_cochera, PDO::PARAM_STR);
         $consulta->execute();
         $rdo_consulta = $consulta->fetchAll(PDO::FETCH_ASSOC);      
 
-        $rdo_consulta = str_split($rdo_consulta[0]["piso"]);
+        $rdo_consulta = str_split($rdo_consulta[0]["nombre"]);
 
         return "Piso ".$rdo_consulta[0]." Sección ".$rdo_consulta[1];
     }

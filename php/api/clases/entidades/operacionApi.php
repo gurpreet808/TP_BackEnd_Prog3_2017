@@ -143,8 +143,17 @@ class operacionApi extends operacion implements IApiUsable{
 				} else {
 					$todasLasOperaciones = operacion::TraerOperacionesDeUnVehiculo($ArrayDeParametros['patente']);
 					
-					if ($todasLasOperaciones) {
-						return $newResponse->getBody()->write('<p>ERROR!! Ese vehiculo ya está estacionado en '."cochera".'.</p>');			
+					$vehiculo;
+
+					foreach ($todasLasOperaciones as $key => $value) {
+						if ($value->fecha_hora_salida == NULL) {
+							$vehiculo = $value;
+						}
+					}
+					
+					if ($vehiculo) {
+						$nombre_cochera = operacion::NombreCochera($vehiculo->cochera);
+						return $newResponse->getBody()->write('<p>ERROR!! Ese vehiculo ya está estacionado en '.$nombre_cochera.'.</p>');			
 					} else {
 						
 						$libres = operacion::CocherasLibres($ArrayDeParametros['discapacitado_embarazada']);
@@ -262,7 +271,7 @@ class operacionApi extends operacion implements IApiUsable{
 						"<br>Marca: ".$mioperacion->marca.
 						"<br>Fecha y hora de ingreso: ".$mioperacion->fecha_hora_ingreso.
 						"<br>Fecha y hora de salida: ".$mioperacion->fecha_hora_salida.
-						"<br>Estadía (hs): ".$mioperacion->tiempo.
+						"<br>Estadía: ".$mioperacion->tiempo." hs.".
 						"<br>Cochera: ".$nombre_cochera.
 						"<br><br>IMPORTE: $".$mioperacion->importe;
 					} else {
