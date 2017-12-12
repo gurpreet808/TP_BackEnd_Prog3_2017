@@ -37,14 +37,27 @@ class Empleado{
     }
     
     public function BorrarEmpleado(){
-	 	$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-		//lo borra mediante el ID de la instancia que se creó
+	 	$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
         $consulta =$objetoAccesoDato->RetornarConsulta("DELETE FROM Empleados WHERE id=:id");
         $consulta->bindValue(':id',$this->id, PDO::PARAM_INT);
         $consulta->execute();
         
         return $consulta->rowCount();
     }
+
+    //BORRADO TEMPORAL PARA MANTENER LOS DATOS EN BBDD
+    /*
+    public function BorrarEmpleado(){
+        $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+       //lo borra mediante el ID de la instancia que se creó
+       $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE Empleados SET 
+       perfil='borrado'
+       WHERE id=:id");
+       $consulta->bindValue(':id',$this->id, PDO::PARAM_INT);
+       $consulta->execute();
+       
+       return $consulta->rowCount();
+    }*/
     
     public function ModificarEmpleado(){
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
@@ -168,7 +181,7 @@ class Empleado{
     }
 
     public static function VerificarClave($mail, $clave){
-        if(empty(Empleado::TraerUnEmpleado($mail))){
+        if(empty(self::TraerUnEmpleado($mail)) or (self::TraerUnEmpleado($mail))->perfil == "borrado"){
             return "NO_MAIL";
         } else {
             $unEmpleado = self::TraerUnEmpleado($mail);

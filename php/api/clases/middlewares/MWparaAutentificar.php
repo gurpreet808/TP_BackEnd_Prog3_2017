@@ -92,7 +92,7 @@ class MWparaAutentificar
 		$newResponse = $response;
 	
 		if ($objDelaRespuesta == null or array_key_exists('payload',$objDelaRespuesta)) {
-			if ($objDelaRespuesta->payload["perfil"]!="admin") {
+			if ($objDelaRespuesta->payload["perfil"]!="administrador") {
 				$objDelaRespuesta->esValido = false;
 				$objDelaRespuesta->respuesta = "Solo administradores";
 

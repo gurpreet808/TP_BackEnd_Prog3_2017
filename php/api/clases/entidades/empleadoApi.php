@@ -76,17 +76,15 @@ class empleadoApi extends Empleado implements IApiUsable{
 		or !array_key_exists('clave', $ArrayDeParametros) 
 		or !array_key_exists('mail', $ArrayDeParametros) 
 		or !array_key_exists('turno', $ArrayDeParametros)
-		or !array_key_exists('perfil', $ArrayDeParametros)
-		or !array_key_exists('fecha_creacion', $ArrayDeParametros)) {
+		or !array_key_exists('perfil', $ArrayDeParametros)) {
 			$newResponse = $newResponse->withAddedHeader('alertType', "warning");
 			$rta = '<p>Ingrese todas las keys (
 				"nombre", 
 				"apellido", 
 				"clave",
 				"mail",
-				"turno", 
-				"perfil" y 
-				"fecha_creacion"
+				"turno" y 
+				"perfil"
 				)</p>';
 		} else {
 			if ($ArrayDeParametros['nombre']==null 
@@ -94,19 +92,33 @@ class empleadoApi extends Empleado implements IApiUsable{
 			or $ArrayDeParametros['clave']==null
 			or $ArrayDeParametros['mail']==null 
 			or $ArrayDeParametros['turno']==null
-			or $ArrayDeParametros['perfil']==null
-			or $ArrayDeParametros['fecha_creacion']==null) {
+			or $ArrayDeParametros['perfil']==null) {
 				$newResponse = $newResponse->withAddedHeader('alertType', "danger");
 				$rta = '<p>ERROR!! Ingrese todos los datos (
 					"nombre", 
 					"apellido", 
 					"clave",
 					"mail",
-					"turno", 
-					"perfil" y 
-					"fecha_creacion"
+					"turno" y 
+					"perfil"
 					)</p>';
 			}else {
+
+				if ($ArrayDeParametros['turno'] != "mañana" 
+				&& $ArrayDeParametros['turno'] != "tarde" 
+				&& $ArrayDeParametros['turno'] != "noche") {
+					return $newResponse->getBody()->write('<p>ERROR!! Sólo puede ingresar "mañana", "tarde" o "noche" en el turno.</p>');
+				}
+
+				if ($ArrayDeParametros['perfil'] != "usuario" 
+				&& $ArrayDeParametros['perfil'] != "administrador") {
+					return $newResponse->getBody()->write('<p>ERROR!! Sólo puede ingresar "usuario" o "administrador" en el perfil.</p>');
+				}
+
+				if (!empty(Empleado::TraerUnEmpleado($ArrayDeParametros['mail']))) {
+					return $newResponse->getBody()->write('<p>ERROR!! Ese mail ya está registrado.</p>');
+				}
+
 				$miempleado = new empleado();
 				
 				$miempleado->nombre=$ArrayDeParametros['nombre'];
@@ -114,7 +126,7 @@ class empleadoApi extends Empleado implements IApiUsable{
 				$miempleado->mail=$ArrayDeParametros['mail'];
 				$miempleado->turno=$ArrayDeParametros['turno'];
 				$miempleado->perfil=$ArrayDeParametros['perfil'];
-				$miempleado->fecha_creacion=$ArrayDeParametros['fecha_creacion'];
+				$miempleado->fecha_creacion=date("Y-m-d H:i:s");
 
 				$miempleado->setClave($ArrayDeParametros['clave']);
 				
@@ -228,7 +240,7 @@ class empleadoApi extends Empleado implements IApiUsable{
 			$empleado = new empleado();
 			$empleado->id = $id;
 			
-			$cantidadDeBorrados = $empleado->Borrarempleado();
+			$cantidadDeBorrados = $empleado->BorrarEmpleado();
 
 			if($cantidadDeBorrados>0) {
 				$newResponse = $newResponse->withAddedHeader('alertType', "success");
@@ -250,44 +262,78 @@ class empleadoApi extends Empleado implements IApiUsable{
 		$ArrayDeParametros = $request->getParsedBody();
 
 		if ($ArrayDeParametros == null
-		or !array_key_exists('id', $ArrayDeParametros) 
-		or !array_key_exists('nombre', $ArrayDeParametros) 
-		or !array_key_exists('apellido', $ArrayDeParametros) 
-		or !array_key_exists('clave', $ArrayDeParametros) 
-		or !array_key_exists('mail', $ArrayDeParametros) 
-		or !array_key_exists('turno', $ArrayDeParametros)
-		or !array_key_exists('perfil', $ArrayDeParametros)) {
+		or !array_key_exists('id', $ArrayDeParametros)) {
 			$newResponse = $newResponse->withAddedHeader('alertType', "warning");
-			$rta = '<p>Ingrese todas las keys (
-				"id",
-				"nombre", 
-				"apellido", 
-				"clave",
-				"mail",
-				"turno" y  
-				"perfil"
-				)</p>';
+			$rta = '<p>Ingrese debe ingresar al menos la key "id"</p>';
 		} else {
-			if ($ArrayDeParametros['id']==null
-			or $ArrayDeParametros['nombre']==null  
-			or $ArrayDeParametros['apellido']==null 
-			or $ArrayDeParametros['clave']==null
-			or $ArrayDeParametros['mail']==null 
-			or $ArrayDeParametros['turno']==null
-			or $ArrayDeParametros['perfil']==null) {
+			if ($ArrayDeParametros['id']==null) {
 				$newResponse = $newResponse->withAddedHeader('alertType', "danger");
-				$rta = '<p>ERROR!! Ingrese todos los datos (
-					"id",
-					"nombre", 
-					"apellido", 
-					"clave",
-					"mail",
-					"turno" y 
-					"perfil"
-					)</p>';
+				$rta = '<p>ERROR!! Complete el campo de la key "id"</p>';
 			}else {
+
 				$miempleado = empleado::TraerUnempleadoPorId($ArrayDeParametros['id']);
 
+				$array_nombre = self::comprobar_key("nombre", $ArrayDeParametros);
+				if ($array_nombre["esValido"]) {
+					$miempleado->nombre=$ArrayDeParametros['nombre'];
+				} elseif (array_key_exists('msg', $array_nombre)) {
+					return $newResponse->getBody()->write($array_nombre["msg"]);
+				}
+
+				$array_apellido = self::comprobar_key("apellido", $ArrayDeParametros);
+				if ($array_apellido["esValido"]) {
+					$miempleado->apellido=$ArrayDeParametros['apellido'];
+				} elseif (array_key_exists('msg', $array_apellido)) {
+					return $newResponse->getBody()->write($array_apellido["msg"]);
+				}
+
+				
+				$array_mail = self::comprobar_key("mail", $ArrayDeParametros);
+				if ($array_mail["esValido"]) {
+					if (!empty(Empleado::TraerUnEmpleado($ArrayDeParametros['mail'])) && (Empleado::TraerUnEmpleado($ArrayDeParametros['mail']))->id != $miempleado->id) {
+						return $newResponse->getBody()->write('<p>ERROR!! Ese mail ya está registrado.</p>');
+					}
+
+					$miempleado->mail=$ArrayDeParametros['mail'];
+
+				} elseif (array_key_exists('msg', $array_mail)) {
+					return $newResponse->getBody()->write($array_mail["msg"]);
+				}
+
+				$array_turno = self::comprobar_key("turno", $ArrayDeParametros);
+				if ($array_turno["esValido"]) {
+					if ($ArrayDeParametros['turno'] != "mañana" 
+					&& $ArrayDeParametros['turno'] != "tarde" 
+					&& $ArrayDeParametros['turno'] != "noche") {
+						return $newResponse->getBody()->write('<p>ERROR!! Sólo puede ingresar "mañana", "tarde" o "noche" en el turno.</p>');
+					}
+
+					$miempleado->turno=$ArrayDeParametros['turno'];
+				} elseif (array_key_exists('msg', $array_turno)) {
+					return $newResponse->getBody()->write($array_turno["msg"]);
+				}
+
+				$array_perfil = self::comprobar_key("perfil", $ArrayDeParametros);
+				if ($array_perfil["esValido"]) {
+					if ($ArrayDeParametros['perfil'] != "usuario" 
+					&& $ArrayDeParametros['perfil'] != "administrador"
+					&& $ArrayDeParametros['perfil'] != "suspendido") {
+						return $newResponse->getBody()->write('<p>ERROR!! Sólo puede ingresar "usuario" o "administrador" en el perfil.</p>');
+					}
+
+					$miempleado->perfil=$ArrayDeParametros['perfil'];
+				} elseif (array_key_exists('msg', $array_perfil)) {
+					return $newResponse->getBody()->write($array_perfil["msg"]);
+				}
+
+				$array_clave = self::comprobar_key("clave", $ArrayDeParametros);
+				if ($array_clave["esValido"]) {
+					$miempleado->setClave($ArrayDeParametros['clave']);
+				} elseif (array_key_exists('msg', $array_clave)) {
+					return $newResponse->getBody()->write($array_clave["msg"]);
+				}
+
+				/*
 				$miempleado->nombre=$ArrayDeParametros['nombre'];
 				$miempleado->apellido=$ArrayDeParametros['apellido'];
 				$miempleado->mail=$ArrayDeParametros['mail'];
@@ -295,6 +341,7 @@ class empleadoApi extends Empleado implements IApiUsable{
 				$miempleado->perfil=$ArrayDeParametros['perfil'];
 
 				$miempleado->setClave($ArrayDeParametros['clave']);
+				*/
 
 				$newResponse = $newResponse->withAddedHeader('alertType', "success");
 				if ($miempleado->ModificarEmpleado()>0) {
@@ -316,6 +363,21 @@ class empleadoApi extends Empleado implements IApiUsable{
 		$newResponse = $newResponse->withAddedHeader('Authorization', "Bye bye..");
 
 		return $newResponse->getBody()->write("Deslogueo Correcto");
+	}
+	
+	public static function comprobar_key($tag, $unArray){
+        $rta_array = array();
+        $rta_array["esValido"] = false;
+        
+        if (array_key_exists($tag, $unArray)) {
+			if ($unArray[$tag]==null) {
+                $rta_array["msg"] = '<p>ERROR!! Complete el campo de la key "'.$tag.'" </p>';
+			} else {
+                $rta_array["esValido"] = true;
+            }
+        }
+
+        return $rta_array;
     }
 }
 ?>
