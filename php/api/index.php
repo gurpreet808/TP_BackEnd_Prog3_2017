@@ -47,7 +47,9 @@ $app->group('/empleado', function () {
   //$this->post('/modificarme', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
 
   //Administradores
-  //$this->post('/logueos/{mail}', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');  
+  $this->post('/logueos', \empleadoApi::class . ':TodosLosLogueos')->add(\MWparaAutentificar::class . ':VerificarAdmin');
+  
+  $this->post('/logueos/{mail}', \empleadoApi::class . ':UnLogueo')->add(\MWparaAutentificar::class . ':VerificarAdmin');
 
   //$this->post('/operaciones/{mail}', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');    
 

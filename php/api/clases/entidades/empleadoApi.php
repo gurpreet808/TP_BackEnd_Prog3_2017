@@ -11,7 +11,7 @@ class empleadoApi extends Empleado implements IApiUsable{
 		$newResponse = $response;
 
 		try {
-			Empleado::TraerTodosLosEmpleados();
+			empleado::TraerTodosLosEmpleados();
 			$newResponse = $next($request, $response);
 			
 		} catch (Exception $e) {
@@ -48,7 +48,7 @@ class empleadoApi extends Empleado implements IApiUsable{
 
  	public function TraerUno($request, $response, $args) {
      	$mail = $args['mail'];
-		$elEmpleado = Empleado::TraerUnEmpleado($mail);
+		$elEmpleado = empleado::TraerUnEmpleado($mail);
 		
 		$newResponse = $response;
 		
@@ -60,7 +60,7 @@ class empleadoApi extends Empleado implements IApiUsable{
 	}
 	
     public function TraerTodos($request, $response, $args) {
-      	$todosLosEmpleados = Empleado::TraerTodosLosEmpleados();
+      	$todosLosEmpleados = empleado::TraerTodosLosEmpleados();
      	$response = $response->withJson($todosLosEmpleados, 200);  
 		
 		 return $response;
@@ -117,7 +117,7 @@ class empleadoApi extends Empleado implements IApiUsable{
 					return $newResponse->getBody()->write('<p>ERROR!! Sólo puede ingresar "usuario" o "administrador" en el perfil.</p>');
 				}
 
-				if (!empty(Empleado::TraerUnEmpleado($ArrayDeParametros['mail']))) {
+				if (!empty(empleado::TraerUnEmpleado($ArrayDeParametros['mail']))) {
 					return $newResponse->getBody()->write('<p>ERROR!! Ese mail ya está registrado.</p>');
 				}
 
@@ -201,6 +201,10 @@ class empleadoApi extends Empleado implements IApiUsable{
 	
 							$newResponse = $newResponse->withAddedHeader('alertType', "success");
 							$rta = "<strong>¡Bien!</strong> empleado (e-mail) y clave válidos";
+
+							if (!$unEmpleado->GuardarLogueo()) {
+								$rta = $rta."<p>Hubo un error al guardar el historial de ingreso</p>";
+							}
 							
 							break;
 						
@@ -292,7 +296,7 @@ class empleadoApi extends Empleado implements IApiUsable{
 				
 				$array_mail = self::comprobar_key("mail", $ArrayDeParametros);
 				if ($array_mail["esValido"]) {
-					if (!empty(Empleado::TraerUnEmpleado($ArrayDeParametros['mail'])) && empleado::TraerUnEmpleado($ArrayDeParametros['mail'])->id != $miempleado->id) {
+					if (!empty(empleado::TraerUnEmpleado($ArrayDeParametros['mail'])) && empleado::TraerUnEmpleado($ArrayDeParametros['mail'])->id != $miempleado->id) {
 						return $newResponse->getBody()->write('<p>ERROR!! Ese mail ya está registrado.</p>');
 					}
 
@@ -380,6 +384,26 @@ class empleadoApi extends Empleado implements IApiUsable{
         }
 
         return $rta_array;
-    }
+	}
+	
+	public function TodosLosLogueos($request, $response, $args) {
+		 $logueos = empleado::TraerLogueos();
+		 $response = $response->withJson($logueos, 200);  
+		
+		 return $response;
+	}
+
+	public function UnLogueo($request, $response, $args) {
+		$mail = $args['mail'];
+		$logueosEmpleado = empleado::TraerLogueosDeUnEmpleado($mail);
+		
+		$newResponse = $response;
+		
+		if (!$logueosEmpleado) {
+			return $newResponse->getBody()->write('<p>ERROR!! No se encontró ese empleado.</p>');			
+		}	
+	
+		return $newResponse->withJson($logueosEmpleado, 200);
+	} 
 }
 ?>
