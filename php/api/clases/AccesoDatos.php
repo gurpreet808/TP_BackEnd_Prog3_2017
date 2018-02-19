@@ -15,6 +15,7 @@ class AccesoDatos{
     public $pass = "estacionamiento.2017";
     */
     
+
     private function __construct(){
         try {
             $this->objetoPDO = new PDO('mysql:host='.$this->host.';dbname='.$this->dbname.';charset=utf8', $this->user, $this->pass, array(PDO::ATTR_EMULATE_PREPARES => false,PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
