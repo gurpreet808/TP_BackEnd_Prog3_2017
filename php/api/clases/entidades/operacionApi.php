@@ -67,15 +67,15 @@ class operacionApi extends operacion implements IApiUsable{
 
  	public function TraerUno($request, $response, $args) {
      	$mail = $args['mail'];
-		$laOperacion = operacion::TraerUnoperacion($mail);
+		$eloperacion = operacion::TraerUnoperacion($mail);
 		
 		$newResponse = $response;
 		
-		if (!$laOperacion) {
+		if (!$eloperacion) {
 			return $newResponse->getBody()->write('<p>ERROR!! No se encontró ese operacion.</p>');			
 		}	
 
-    	return $newResponse->withJson($laOperacion, 200);
+    	return $newResponse->withJson($eloperacion, 200);
 	}
 	
     public function TraerTodos($request, $response, $args) {
@@ -143,17 +143,8 @@ class operacionApi extends operacion implements IApiUsable{
 				} else {
 					$todasLasOperaciones = operacion::TraerOperacionesDeUnVehiculo($ArrayDeParametros['patente']);
 					
-					$vehiculo = "NO";
-
-					foreach ($todasLasOperaciones as $key => $value) {
-						if ($value->fecha_hora_salida == NULL) {
-							$vehiculo = $value;
-						}
-					}
-					
-					if ($vehiculo != "NO") {
-						$nombre_cochera = operacion::NombreCochera($vehiculo->cochera);
-						return $newResponse->getBody()->write('<p>ERROR!! Ese vehiculo ya está estacionado en '.$nombre_cochera.'.</p>');			
+					if ($todasLasOperaciones) {
+						return $newResponse->getBody()->write('<p>ERROR!! Ese vehiculo ya está estacionado en '."cochera".'.</p>');			
 					} else {
 						
 						$libres = operacion::CocherasLibres($ArrayDeParametros['discapacitado_embarazada']);
@@ -168,7 +159,6 @@ class operacionApi extends operacion implements IApiUsable{
 						} else {
 							
 							$mioperacion = new operacion();
-
 							
 							$mioperacion->patente=$ArrayDeParametros['patente'];
 							$mioperacion->color=$ArrayDeParametros['color'];
@@ -177,10 +167,7 @@ class operacionApi extends operacion implements IApiUsable{
 							
 							//cohera random
 							$mioperacion->cochera = $libres[array_rand($libres, 1)];
-							
-							if(!operacion::UsarCochera($mioperacion->cochera)){
-								return $newResponse->getBody()->write("<p>ERROR!! No se pudo contar el uso.</p>");
-							}
+
 			
 							//tomo el token del header para ID empleado
 							$arrayConToken = $request->getHeader('Authorization');
@@ -275,7 +262,7 @@ class operacionApi extends operacion implements IApiUsable{
 						"<br>Marca: ".$mioperacion->marca.
 						"<br>Fecha y hora de ingreso: ".$mioperacion->fecha_hora_ingreso.
 						"<br>Fecha y hora de salida: ".$mioperacion->fecha_hora_salida.
-						"<br>Estadía: ".$mioperacion->tiempo." hs.".
+						"<br>Estadía (hs): ".$mioperacion->tiempo.
 						"<br>Cochera: ".$nombre_cochera.
 						"<br><br>IMPORTE: $".$mioperacion->importe;
 					} else {
@@ -473,22 +460,9 @@ class operacionApi extends operacion implements IApiUsable{
 	public function LogOut($request, $response, $args) {
 
 		$newResponse = $response;		
-		$newResponse = $newResponse->withAddedHeader('Authorization', "Chau..");
+		$newResponse = $newResponse->withAddedHeader('Authorization', "Bye bye..");
 
 		return $newResponse->getBody()->write("Deslogueo Correcto");
-	}
-	
-	public function OperacionesEmpleado($request, $response, $args) {
-		$id = (int)$args['id'];
-		$logueosEmpleado = operacion::TraerOperacionesDeUnEmpleado($id);
-		
-		$newResponse = $response;
-		
-		if (!$logueosEmpleado) {
-			return $newResponse->getBody()->write('<p>ERROR!! No se encontró ese empleado.</p>');			
-		}	
-	
-		return $newResponse->withJson($logueosEmpleado, 200);
-	} 
+    }
 }
 ?>

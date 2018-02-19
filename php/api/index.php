@@ -44,12 +44,12 @@ $app->group('/empleado', function () {
   
   $this->get('/{mail}', \empleadoApi::class . ':traerUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
 
-  //Administradores
-  $this->post('/logueos', \empleadoApi::class . ':TodosLosLogueos')->add(\MWparaAutentificar::class . ':VerificarAdmin');
-  
-  $this->post('/logueos/{mail}', \empleadoApi::class . ':UnLogueo')->add(\MWparaAutentificar::class . ':VerificarAdmin');
+  //$this->post('/modificarme', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
 
-  //$this->post('/operaciones/{id}', \operacionApi::class . ':OperacionesEmpleado')->add(\MWparaAutentificar::class . ':VerificarAdmin');    
+  //Administradores
+  //$this->post('/logueos/{mail}', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');  
+
+  //$this->post('/operaciones/{mail}', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');    
 
   $this->post('/', \empleadoApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');
 
@@ -95,12 +95,6 @@ $app->group('/cochera', function () {
     $this->delete('/', \cocheraApi::class . ':BorrarUno');
    
     $this->put('/', \cocheraApi::class . ':ModificarUno');
-
-    $this->post('/masUsada', \cocheraApi::class . ':CargarUno');
-
-    $this->post('/menosUsada', \cocheraApi::class . ':CargarUno');
-
-    $this->post('/sinUso', \cocheraApi::class . ':CargarUno');
 
   })->add(\MWparaAutentificar::class . ':VerificarAdmin');
 
