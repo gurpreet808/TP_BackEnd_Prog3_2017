@@ -3,9 +3,14 @@ class AccesoDatos{
     private static $ObjetoAccesoDatos;
     private $objetoPDO;
  
+    private $host = 'localhost';
+    private $dbname = 'u779441249_park';
+    private $user = 'u779441249_admin';
+    private $pass = 'estacionamiento.2017';
+ 
     private function __construct(){
         try { 
-            $this->objetoPDO = new PDO('mysql:host=localhost;u779441249_park;charset=utf8', 'u779441249_admin', 'admin', array(PDO::ATTR_EMULATE_PREPARES => false,PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+            $this->objetoPDO = new PDO('mysql:host='.$host.';dbname='.$dbname.';charset=utf8', $user, $pass, array(PDO::ATTR_EMULATE_PREPARES => false,PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
             $this->objetoPDO->exec("SET CHARACTER SET utf8");
         } catch (PDOException $e) { 
             print "Error!: " . $e->getMessage(); 
