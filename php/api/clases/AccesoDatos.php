@@ -3,14 +3,21 @@ class AccesoDatos{
     private static $ObjetoAccesoDatos;
     private $objetoPDO;
  
-    private $host = 'localhost';
-    private $dbname = 'u779441249_park';
-    private $user = 'u779441249_admin';
-    private $pass = 'estacionamiento.2017';
- 
+    public $host = 'localhost';
+    public $dbname = 'u779441249_park';
+    //Hostinger
+    public $user = "u779441249_admin";
+    public $pass = "estacionamiento.2017";
+
+    //Localhost
+    /*
+    public $user = "u779441249_admin";
+    public $pass = "estacionamiento.2017";
+    */
+    
     private function __construct(){
-        try { 
-            $this->objetoPDO = new PDO('mysql:host='.$host.';dbname='.$dbname.';charset=utf8', $user, $pass, array(PDO::ATTR_EMULATE_PREPARES => false,PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+        try {
+            $this->objetoPDO = new PDO('mysql:host='.$this->host.';dbname='.$this->dbname.';charset=utf8', $this->user, $this->pass, array(PDO::ATTR_EMULATE_PREPARES => false,PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
             $this->objetoPDO->exec("SET CHARACTER SET utf8");
         } catch (PDOException $e) { 
             print "Error!: " . $e->getMessage(); 
