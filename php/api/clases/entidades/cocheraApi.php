@@ -19,7 +19,7 @@ class cocheraApi extends cochera implements IApiUsable{
 			$consulta =$objetoAccesoDato->RetornarConsulta("CREATE TABLE `cocheras` (
 				`id_cochera` INT NOT NULL AUTO_INCREMENT, 
 				`nombre` VARCHAR(2) NOT NULL, 
-				`especial` VARCHAR(45), 
+				`especial` VARCHAR(45),
 				PRIMARY KEY (`id_cochera`)
 			)");
 			

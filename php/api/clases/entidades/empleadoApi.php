@@ -38,10 +38,10 @@ class empleadoApi extends Empleado implements IApiUsable{
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
 		$consulta =$objetoAccesoDato->RetornarConsulta("INSERT INTO empleados (nombre,apellido,clave,mail,turno,perfil,fecha_creacion)
 	 		values
-			 ('Administrador','Administrator','admin','admin@admin.com','mañana','administrador','15/11/16 21:25:08'), 
-			 ('Martin','Garcia','martin','martin@martin.com','mañana','usuario','01/12/16 12:03:17'),
-			 ('Gisela','Diaz','gisela','gisela@gisela.com','tarde','usuario','01/12/16 12:03:55'),
-			 ('Diego','Lopez','diego','diego@diego.com','noche','usuario','01/12/16 12:04:21')");
+			 ('Administrador','Administrator','admin','admin@admin.com','mañana','administrador','2017-11-15 21:25:08'), 
+			 ('Martin','Garcia','martin','martin@martin.com','mañana','usuario','2017-12-01 12:03:17'),
+			 ('Gisela','Diaz','gisela','gisela@gisela.com','tarde','usuario','2017-12-01 12:03:55'),
+			 ('Diego','Lopez','diego','diego@diego.com','noche','usuario','2017-12-01 12:04:21')");
 	
 		return $consulta->execute();
 	}
@@ -182,9 +182,9 @@ class empleadoApi extends Empleado implements IApiUsable{
 
 					$token = "";
 
-					switch (empleado::VerificarClave($mail, $clave)) {
+					switch (Empleado::VerificarClave($mail, $clave)) {
 						case "VALIDO":
-							$unEmpleado = empleado::TraerUnEmpleado($mail);
+							$unEmpleado = Empleado::TraerUnEmpleado($mail);
 							
 							//Datos para el token
 							$datosEmpleado = array(
@@ -201,6 +201,10 @@ class empleadoApi extends Empleado implements IApiUsable{
 	
 							$newResponse = $newResponse->withAddedHeader('alertType', "success");
 							$rta = "<strong>¡Bien!</strong> empleado (e-mail) y clave válidos";
+
+							if (!$unEmpleado->GuardarLogueo()) {
+								$rta = $rta."<p>Hubo un error al guardar el historial de ingreso</p>";
+							}
 							
 							break;
 						
@@ -273,9 +277,7 @@ class empleadoApi extends Empleado implements IApiUsable{
 				$rta = '<p>ERROR!! Complete el campo de la key "id"</p>';
 			}else {
 
-				$miempleado = empleado::TraerUnempleadoPorId($ArrayDeParametros['id']);
-
-				var_dump($miempleado);
+				$miempleado = Empleado::TraerUnempleadoPorId($ArrayDeParametros['id']);
 
 				$array_nombre = self::comprobar_key("nombre", $ArrayDeParametros);
 				if ($array_nombre["esValido"]) {
@@ -294,7 +296,7 @@ class empleadoApi extends Empleado implements IApiUsable{
 				
 				$array_mail = self::comprobar_key("mail", $ArrayDeParametros);
 				if ($array_mail["esValido"]) {
-					if (!empty(Empleado::TraerUnEmpleado($ArrayDeParametros['mail'])) && (Empleado::TraerUnEmpleado($ArrayDeParametros['mail']))->id != $miempleado->id) {
+					if (!empty(empleado::TraerUnEmpleado($ArrayDeParametros['mail'])) && empleado::TraerUnEmpleado($ArrayDeParametros['mail'])->id != $miempleado->id){
 						return $newResponse->getBody()->write('<p>ERROR!! Ese mail ya está registrado.</p>');
 					}
 
@@ -329,14 +331,14 @@ class empleadoApi extends Empleado implements IApiUsable{
 				} elseif (array_key_exists('msg', $array_perfil)) {
 					return $newResponse->getBody()->write($array_perfil["msg"]);
 				}
-/*
+
 				$array_clave = self::comprobar_key("clave", $ArrayDeParametros);
 				if ($array_clave["esValido"]) {
 					$miempleado->setClave($ArrayDeParametros['clave']);
 				} elseif (array_key_exists('msg', $array_clave)) {
 					return $newResponse->getBody()->write($array_clave["msg"]);
 				}
-*/
+
 				/*
 				$miempleado->nombre=$ArrayDeParametros['nombre'];
 				$miempleado->apellido=$ArrayDeParametros['apellido'];
@@ -382,6 +384,26 @@ class empleadoApi extends Empleado implements IApiUsable{
         }
 
         return $rta_array;
-    }
+	}
+	
+	public function TodosLosLogueos($request, $response, $args) {
+		 $logueos = Empleado::TraerLogueos();
+		 $response = $response->withJson($logueos, 200);  
+		
+		 return $response;
+	}
+
+	public function UnLogueo($request, $response, $args) {
+		$mail = $args['mail'];
+		$logueosEmpleado = Empleado::TraerLogueosDeUnEmpleado($mail);
+		
+		$newResponse = $response;
+		
+		if (!$logueosEmpleado) {
+			return $newResponse->getBody()->write('<p>ERROR!! No se encontró ese empleado.</p>');			
+		}	
+	
+		return $newResponse->withJson($logueosEmpleado, 200);
+	} 
 }
 ?>

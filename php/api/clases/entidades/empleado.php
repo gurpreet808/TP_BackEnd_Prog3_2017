@@ -181,7 +181,7 @@ class Empleado{
     }
 
     public static function VerificarClave($mail, $clave){
-        if(empty(self::TraerUnEmpleado($mail)) or (self::TraerUnEmpleado($mail))->perfil == "borrado"){
+        if(empty(self::TraerUnEmpleado($mail)) or self::TraerUnEmpleado($mail)->perfil == "borrado"){
             return "NO_MAIL";
         } else {
             $unEmpleado = self::TraerUnEmpleado($mail);
@@ -201,6 +201,61 @@ class Empleado{
             $unEmpleado = self::TraerUnEmpleado($mail);
             return $unEmpleado->ToJSON();
         }
+    }
+
+    public function GuardarLogueo(){
+        
+		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
+        //inserta enlazando parametros dela instancia
+		$consulta =$objetoAccesoDato->RetornarConsulta("INSERT INTO ingresos_empleados (
+            fecha_hora_ingreso,
+            id_empleado
+            )values(
+            :fecha_hora_ingreso,
+            :id_empleado)");
+        
+		$consulta->bindValue(':fecha_hora_ingreso', date("Y-m-d H:i:s"), PDO::PARAM_STR);
+		$consulta->bindValue(':id_empleado', $this->id, PDO::PARAM_INT);
+        
+        return $consulta->execute();
+    }
+
+    public static function TraerLogueos(){        
+		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
+        //inserta enlazando parametros dela instancia
+		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT 
+        i.`fecha_hora_ingreso`,
+        e.`id`,
+        e.`nombre`,
+        e.`apellido`,
+        e.`mail`,
+        e.`turno`,
+        e.`perfil` 
+        FROM `empleados` as e, `ingresos_empleados` as i 
+        WHERE i.`id_empleado` = e.`id`");
+        
+        $consulta->execute();
+
+        return $consulta->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function TraerLogueosDeUnEmpleado($mail){        
+		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
+		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT 
+        i.`fecha_hora_ingreso`,
+        e.`id`,
+        e.`nombre`,
+        e.`apellido`,
+        e.`mail`,
+        e.`turno`,
+        e.`perfil` 
+        FROM `empleados` as e, `ingresos_empleados` as i 
+        WHERE i.`id_empleado` = e.`id` AND e.`mail` = :mail");
+        
+        $consulta->bindValue(':mail', $mail, PDO::PARAM_STR);
+        $consulta->execute();
+
+        return $consulta->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 ?>
