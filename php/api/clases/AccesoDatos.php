@@ -14,7 +14,6 @@ class AccesoDatos{
     public $user = "u779441249_admin";
     public $pass = "estacionamiento.2017";
     */
-    
 
     private function __construct(){
         try {
