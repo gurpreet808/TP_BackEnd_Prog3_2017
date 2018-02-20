@@ -90,7 +90,7 @@ $app->group('/operaciones', function () {
   
   $this->get('/{id_empleado}', \operacionApi::class . ':OperacionesEmpleado')->add(\MWparaAutentificar::class . ':VerificarUsuario');
   
-  $this->post('/por_fecha', \operacionApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
+  //$this->post('/por_fecha', \operacionApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
   
   $this->delete('/', \operacionApi::class . ':BorrarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');
   
@@ -113,11 +113,11 @@ $app->group('/cochera', function () {
    
     $this->put('/', \cocheraApi::class . ':ModificarUno');
 
-    $this->post('/masUsada', \cocheraApi::class . ':CargarUno');
+    $this->post('/masUsada', \cocheraApi::class . ':MasUsadas');
 
-    $this->post('/menosUsada', \cocheraApi::class . ':CargarUno');
+    $this->post('/menosUsada', \cocheraApi::class . ':MenosUsadas');
 
-    $this->post('/sinUso', \cocheraApi::class . ':CargarUno');
+    $this->post('/sinUso', \cocheraApi::class . ':SinUsos');
 
   })->add(\MWparaAutentificar::class . ':VerificarAdmin');
 

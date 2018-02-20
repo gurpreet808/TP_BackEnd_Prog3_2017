@@ -51,6 +51,39 @@ class cocheraApi extends cochera implements IApiUsable{
 
     	return $newResponse->withJson($laCochera, 200);
 	}
+
+	public function MasUsadas($request, $response, $args) {
+		$newResponse = $response;
+		$cocheraMasUsada = cochera::CocherasMasUsadas();
+		
+		if (!$cocheraMasUsada) {
+		   return $newResponse->getBody()->write('<p>ERROR!! No hay cocheras usadas.</p>');
+		}	
+
+	   return $newResponse->withJson($cocheraMasUsada, 200);
+	}
+	
+	public function MenosUsadas($request, $response, $args) {
+		$newResponse = $response;
+		$cocheraMenosUsada = cochera::CocherasMenosUsadas();
+		
+		if (!$cocheraMenosUsada) {
+			return $newResponse->getBody()->write('<p>ERROR!! No hay cocheras menos usadas.</p>');
+		}
+		
+		return $newResponse->withJson($cocheraMenosUsada, 200);
+	}
+
+	public function SinUsos($request, $response, $args) {
+		$newResponse = $response;
+		$cocheraMenosUsada = cochera::CocherasSinUso();
+		
+		if (!$cocheraMenosUsada) {
+			return $newResponse->getBody()->write('<p>ERROR!! No hay cocheras que no hayan sido usadas.</p>');
+		}
+		
+		return $newResponse->withJson($cocheraMenosUsada, 200);
+	}
 	
     public function TraerTodos($request, $response, $args) {
       	$todasLascocheras = cochera::TraerTodasLasCocheras();

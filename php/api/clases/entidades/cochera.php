@@ -45,26 +45,42 @@ class Cochera
     }
     
     public static function TraerTodasLasCocheras(){
-		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM cocheras");
-		$consulta->execute();			
-		return $consulta->fetchAll(PDO::FETCH_CLASS, "cochera");
+      $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+      $consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM cocheras");
+      $consulta->execute();			
+      return $consulta->fetchAll(PDO::FETCH_CLASS, "cochera");
     }
     
     public static function TraerUnaCochera($id_cochera){
-		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM cocheras WHERE id_cochera = :id_cochera");
-		$consulta->bindValue(':id_cochera',$id_cochera, PDO::PARAM_STR);
-        $consulta->execute();
-		$cocheraBuscado= $consulta->fetchObject('cochera');
-		return $cocheraBuscado;
+      $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+      $consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM cocheras WHERE id_cochera = :id_cochera");
+      $consulta->bindValue(':id_cochera',$id_cochera, PDO::PARAM_STR);
+      $consulta->execute();
+      $cocheraBuscado= $consulta->fetchObject('cochera');
+      
+      return $cocheraBuscado;
     }
 
     public static function CocherasMasUsadas(){
-		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM cocheras");
-		$consulta->execute();			
-		return $consulta->fetchAll(PDO::FETCH_CLASS, "cochera");
+      $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+      $consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM `cocheras` WHERE `usos`= (SELECT MAX(`usos`) FROM `cocheras`);");
+      $consulta->execute();			
+      
+      return $consulta->fetchAll(PDO::FETCH_CLASS, "cochera");
     }
-}
+
+    public static function CocherasMenosUsadas(){
+      $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+      $consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM `cocheras` WHERE `usos` = ( SELECT MIN(`usos`) FROM  `cocheras` WHERE  `usos` > 0 )");
+      $consulta->execute();			
+      return $consulta->fetchAll(PDO::FETCH_CLASS, "cochera");
+    }
+
+    public static function CocherasSinUso(){
+      $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+      $consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM `cocheras` WHERE `usos` = 0");
+      $consulta->execute();			
+      return $consulta->fetchAll(PDO::FETCH_CLASS, "cochera");
+    }
+  }
 ?>
