@@ -279,83 +279,87 @@ class empleadoApi extends Empleado implements IApiUsable{
 
 				$miempleado = Empleado::TraerUnempleadoPorId($ArrayDeParametros['id']);
 
-				$array_nombre = self::comprobar_key("nombre", $ArrayDeParametros);
-				if ($array_nombre["esValido"]) {
-					$miempleado->nombre=$ArrayDeParametros['nombre'];
-				} elseif (array_key_exists('msg', $array_nombre)) {
-					return $newResponse->getBody()->write($array_nombre["msg"]);
-				}
-
-				$array_apellido = self::comprobar_key("apellido", $ArrayDeParametros);
-				if ($array_apellido["esValido"]) {
-					$miempleado->apellido=$ArrayDeParametros['apellido'];
-				} elseif (array_key_exists('msg', $array_apellido)) {
-					return $newResponse->getBody()->write($array_apellido["msg"]);
-				}
-
-				
-				$array_mail = self::comprobar_key("mail", $ArrayDeParametros);
-				if ($array_mail["esValido"]) {
-					if (!empty(empleado::TraerUnEmpleado($ArrayDeParametros['mail'])) && empleado::TraerUnEmpleado($ArrayDeParametros['mail'])->id != $miempleado->id){
-						return $newResponse->getBody()->write('<p>ERROR!! Ese mail ya está registrado.</p>');
-					}
-
-					$miempleado->mail=$ArrayDeParametros['mail'];
-
-				} elseif (array_key_exists('msg', $array_mail)) {
-					return $newResponse->getBody()->write($array_mail["msg"]);
-				}
-
-				$array_turno = self::comprobar_key("turno", $ArrayDeParametros);
-				if ($array_turno["esValido"]) {
-					if ($ArrayDeParametros['turno'] != "mañana" 
-					&& $ArrayDeParametros['turno'] != "tarde" 
-					&& $ArrayDeParametros['turno'] != "noche") {
-						return $newResponse->getBody()->write('<p>ERROR!! Sólo puede ingresar "mañana", "tarde" o "noche" en el turno.</p>');
-					}
-
-					$miempleado->turno=$ArrayDeParametros['turno'];
-				} elseif (array_key_exists('msg', $array_turno)) {
-					return $newResponse->getBody()->write($array_turno["msg"]);
-				}
-
-				$array_perfil = self::comprobar_key("perfil", $ArrayDeParametros);
-				if ($array_perfil["esValido"]) {
-					if ($ArrayDeParametros['perfil'] != "usuario" 
-					&& $ArrayDeParametros['perfil'] != "administrador"
-					&& $ArrayDeParametros['perfil'] != "suspendido") {
-						return $newResponse->getBody()->write('<p>ERROR!! Sólo puede ingresar "usuario" o "administrador" en el perfil.</p>');
-					}
-
-					$miempleado->perfil=$ArrayDeParametros['perfil'];
-				} elseif (array_key_exists('msg', $array_perfil)) {
-					return $newResponse->getBody()->write($array_perfil["msg"]);
-				}
-
-				$array_clave = self::comprobar_key("clave", $ArrayDeParametros);
-				if ($array_clave["esValido"]) {
-					$miempleado->setClave($ArrayDeParametros['clave']);
-				} elseif (array_key_exists('msg', $array_clave)) {
-					return $newResponse->getBody()->write($array_clave["msg"]);
-				}
-
-				/*
-				$miempleado->nombre=$ArrayDeParametros['nombre'];
-				$miempleado->apellido=$ArrayDeParametros['apellido'];
-				$miempleado->mail=$ArrayDeParametros['mail'];
-				$miempleado->turno=$ArrayDeParametros['turno'];
-				$miempleado->perfil=$ArrayDeParametros['perfil'];
-
-				$miempleado->setClave($ArrayDeParametros['clave']);
-				*/
-
-				$newResponse = $newResponse->withAddedHeader('alertType', "success");
-				if ($miempleado->ModificarEmpleado()>0) {
-					$rta = "Empleado modificado";
-					$newResponse = $newResponse->withAddedHeader('alertType', "success");
+				if (empty($miempleado)) {
+					return $newResponse->getBody()->write('<p>ERROR!! No se encontró el empleado que desea modificar.</p>');
+					# code...
 				} else {
-					$rta = "No se modificó el empleado";
-				}				
+					$array_nombre = self::comprobar_key("nombre", $ArrayDeParametros);
+					if ($array_nombre["esValido"]) {
+						$miempleado->nombre=$ArrayDeParametros['nombre'];
+					} elseif (array_key_exists('msg', $array_nombre)) {
+						return $newResponse->getBody()->write($array_nombre["msg"]);
+					}
+	
+					$array_apellido = self::comprobar_key("apellido", $ArrayDeParametros);
+					if ($array_apellido["esValido"]) {
+						$miempleado->apellido=$ArrayDeParametros['apellido'];
+					} elseif (array_key_exists('msg', $array_apellido)) {
+						return $newResponse->getBody()->write($array_apellido["msg"]);
+					}
+	
+					$array_mail = self::comprobar_key("mail", $ArrayDeParametros);
+					if ($array_mail["esValido"]) {
+						if (!empty(empleado::TraerUnEmpleado($ArrayDeParametros['mail'])) && empleado::TraerUnEmpleado($ArrayDeParametros['mail'])->id != $miempleado->id){
+							return $newResponse->getBody()->write('<p>ERROR!! Ese mail ya está registrado.</p>');
+						}
+	
+						$miempleado->mail=$ArrayDeParametros['mail'];
+	
+					} elseif (array_key_exists('msg', $array_mail)) {
+						return $newResponse->getBody()->write($array_mail["msg"]);
+					}
+	
+					$array_turno = self::comprobar_key("turno", $ArrayDeParametros);
+					if ($array_turno["esValido"]) {
+						if ($ArrayDeParametros['turno'] != "mañana" 
+						&& $ArrayDeParametros['turno'] != "tarde" 
+						&& $ArrayDeParametros['turno'] != "noche") {
+							return $newResponse->getBody()->write('<p>ERROR!! Sólo puede ingresar "mañana", "tarde" o "noche" en el turno.</p>');
+						}
+	
+						$miempleado->turno=$ArrayDeParametros['turno'];
+					} elseif (array_key_exists('msg', $array_turno)) {
+						return $newResponse->getBody()->write($array_turno["msg"]);
+					}
+	
+					$array_perfil = self::comprobar_key("perfil", $ArrayDeParametros);
+					if ($array_perfil["esValido"]) {
+						if ($ArrayDeParametros['perfil'] != "usuario" 
+						&& $ArrayDeParametros['perfil'] != "administrador"
+						&& $ArrayDeParametros['perfil'] != "suspendido") {
+							return $newResponse->getBody()->write('<p>ERROR!! Sólo puede ingresar "usuario", "administrador" o "suspendido" en el perfil.</p>');
+						}
+	
+						$miempleado->perfil=$ArrayDeParametros['perfil'];
+					} elseif (array_key_exists('msg', $array_perfil)) {
+						return $newResponse->getBody()->write($array_perfil["msg"]);
+					}
+	
+					$array_clave = self::comprobar_key("clave", $ArrayDeParametros);
+					if ($array_clave["esValido"]) {
+						$miempleado->setClave($ArrayDeParametros['clave']);
+					} elseif (array_key_exists('msg', $array_clave)) {
+						return $newResponse->getBody()->write($array_clave["msg"]);
+					}
+	
+					/*
+					$miempleado->nombre=$ArrayDeParametros['nombre'];
+					$miempleado->apellido=$ArrayDeParametros['apellido'];
+					$miempleado->mail=$ArrayDeParametros['mail'];
+					$miempleado->turno=$ArrayDeParametros['turno'];
+					$miempleado->perfil=$ArrayDeParametros['perfil'];
+	
+					$miempleado->setClave($ArrayDeParametros['clave']);
+					*/
+	
+					$newResponse = $newResponse->withAddedHeader('alertType', "success");
+					if ($miempleado->ModificarEmpleado()>0) {
+						$rta = "Empleado modificado";
+						$newResponse = $newResponse->withAddedHeader('alertType', "success");
+					} else {
+						$rta = "No se modificó el empleado";
+					}				
+				}
 			}	
 		}
 		$newResponse->getBody()->write($rta);
