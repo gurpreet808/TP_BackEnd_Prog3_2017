@@ -72,14 +72,16 @@ class Cochera
     public static function CocherasMenosUsadas(){
       $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
       $consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM `cocheras` WHERE `usos` = ( SELECT MIN(`usos`) FROM  `cocheras` WHERE  `usos` > 0 )");
-      $consulta->execute();			
+      $consulta->execute();
+
       return $consulta->fetchAll(PDO::FETCH_CLASS, "cochera");
     }
 
     public static function CocherasSinUso(){
       $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
       $consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM `cocheras` WHERE `usos` = 0");
-      $consulta->execute();			
+      $consulta->execute();
+      
       return $consulta->fetchAll(PDO::FETCH_CLASS, "cochera");
     }
   }

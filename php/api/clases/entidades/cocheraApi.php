@@ -76,13 +76,30 @@ class cocheraApi extends cochera implements IApiUsable{
 
 	public function SinUsos($request, $response, $args) {
 		$newResponse = $response;
-		$cocheraMenosUsada = cochera::CocherasSinUso();
+		$cocheraSinUsar = cochera::CocherasSinUso();
 		
-		if (!$cocheraMenosUsada) {
+		if (!$cocheraSinUsar) {
 			return $newResponse->getBody()->write('<p>ERROR!! No hay cocheras que no hayan sido usadas.</p>');
 		}
 		
-		return $newResponse->withJson($cocheraMenosUsada, 200);
+		//return var_dump($cocheraSinUsar);
+		//return $newResponse->withJson($cocheraSinUsar, 200);
+
+		$file="descarga.xls";
+		//$tablaExcel="<table><tr><td>Cell 1</td><td>Cell 2</td></tr></table>";
+
+		$tablaExcel="
+		<table>
+			<tr>
+				<td>Cell 1</td>
+				<td>Cell 2</td>
+			</tr>
+		</table>";
+		
+		$newResponse = $newResponse->withAddedHeader("Content-type","application/vnd.ms-excel");
+		$newResponse = $newResponse->withAddedHeader("Content-Disposition","attachment; filename=$file");
+
+		return $newResponse->getBody()->write($tablaExcel);
 	}
 	
     public function TraerTodos($request, $response, $args) {
