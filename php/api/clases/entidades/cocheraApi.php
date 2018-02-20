@@ -88,13 +88,21 @@ class cocheraApi extends cochera implements IApiUsable{
 		$file="descarga.xls";
 		//$tablaExcel="<table><tr><td>Cell 1</td><td>Cell 2</td></tr></table>";
 
-		$tablaExcel="
-		<table>
-			<tr>
-				<td>Cell 1</td>
-				<td>Cell 2</td>
-			</tr>
-		</table>";
+		$tablaExcel='
+		<table style="border: 2px solid black">
+			<thead>
+				<tr>
+					<th>Titulo 1</td>
+					<th>Titulo 2</td>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Dato 1</td>
+					<td>Dato 2</td>
+				</tr>
+			</tbody>
+		</table>';
 		
 		$newResponse = $newResponse->withAddedHeader("Content-type","application/vnd.ms-excel");
 		$newResponse = $newResponse->withAddedHeader("Content-Disposition","attachment; filename=$file");
