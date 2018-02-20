@@ -176,9 +176,11 @@ class Operacion{
 
     public static function TraerOperacionesDeUnEmpleado($unId){        
 		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
-		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM `operaciones` WHERE `id_empleado_ingreso` = :id OR `id_empleado_salida` = :id");
-        $consulta->bindValue(':id',$unId, PDO::PARAM_STR);
+		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM `operaciones` WHERE `id_empleado_ingreso` = :id1 OR `id_empleado_salida` = :id2");
+        $consulta->bindValue(':id1',$unId, PDO::PARAM_INT);
+        $consulta->bindValue(':id2',$unId, PDO::PARAM_INT);
         
+        //return var_dump($unId);
         $consulta->execute();
 
         return $consulta->fetchAll(PDO::FETCH_ASSOC);

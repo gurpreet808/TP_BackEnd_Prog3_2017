@@ -98,6 +98,30 @@ class operacionApi extends operacion implements IApiUsable{
 		return $newResponse->withJson($todasLasOperaciones, 200);
 	}
 
+	public function OperacionesEmpleado($request, $response, $args) {
+		$id_emp = $args['id_empleado'];
+		$newResponse = $response;
+
+		if (!is_numeric($id_emp)) {
+			return $newResponse->getBody()->write('<p>Debe ingresar el id del empleado.</p>');
+		} else {
+			
+			$id_emp = (int)$id_emp;
+			
+			if (!empty(Empleado::TraerUnempleadoPorId($id_emp))) {
+				$todasLasOperaciones = operacion::TraerOperacionesDeUnEmpleado($id_emp);
+				
+				if (!$todasLasOperaciones) {
+					return $newResponse->getBody()->write('<p>Sin operaciones.</p>');			
+				}	
+		
+				return $newResponse->withJson($todasLasOperaciones, 200);
+			} else {
+				return $newResponse->getBody()->write('<p>No se encontró el empleado con id = '.$id_emp.'.</p>');
+			}
+		}
+	}
+
 	public function BuscarCocherasLibres($request, $response, $args) {
 		//$todasLasOperaciones = operacion::TraerTodasLasOperaciones();
 		//$response = $response->withJson($todasLasOperaciones, 200);  
@@ -208,11 +232,9 @@ class operacionApi extends operacion implements IApiUsable{
 								$rta = "No pudo estacionar el vehiculo";
 							}
 						}
-						
-						
-					}				
+					}
 				}
-			}	
+			}
 		}
 		$newResponse->getBody()->write($rta);
 
@@ -477,18 +499,5 @@ class operacionApi extends operacion implements IApiUsable{
 
 		return $newResponse->getBody()->write("Deslogueo Correcto");
 	}
-	
-	public function OperacionesEmpleado($request, $response, $args) {
-		$id = (int)$args['id'];
-		$logueosEmpleado = operacion::TraerOperacionesDeUnEmpleado($id);
-		
-		$newResponse = $response;
-		
-		if (!$logueosEmpleado) {
-			return $newResponse->getBody()->write('<p>ERROR!! No se encontró ese empleado.</p>');			
-		}	
-	
-		return $newResponse->withJson($logueosEmpleado, 200);
-	} 
 }
 ?>

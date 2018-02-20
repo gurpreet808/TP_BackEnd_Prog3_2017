@@ -45,7 +45,7 @@ class Empleado{
         return $consulta->rowCount();
     }
 
-    //BORRADO TEMPORAL PARA MANTENER LOS DATOS EN BBDD
+    //BORRADO TEMPORAL CAMBIANDO PERFIL PARA MANTENER LOS DATOS EN BBDD
     /*
     public function BorrarEmpleado(){
         $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 

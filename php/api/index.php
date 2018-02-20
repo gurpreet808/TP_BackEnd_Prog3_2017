@@ -39,7 +39,7 @@ $app->group('/empleado', function () {
   //Públicos
   $this->post('/login', \empleadoApi::class . ':LogIn');
   
-  //Logueados
+  //Usuarios Logueados
   $this->get('/', \empleadoApi::class . ':traerTodos')->add(\MWparaAutentificar::class . ':VerificarUsuario');
   
   $this->get('/{mail}', \empleadoApi::class . ':traerUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
@@ -58,12 +58,12 @@ $app->group('/empleado', function () {
   $this->put('/', \empleadoApi::class . ':ModificarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');
 });
 
-/*Operaciones*/
+/*Vehiculo*/
 $app->group('/vehiculo', function () {
   
   //$this->get('/cocheras', \operacionApi::class . ':BuscarCocherasLibres');
 
-  //Logueados
+  //Usuarios Logueados
   $this->get('/', \operacionApi::class . ':TraerTodos')->add(\MWparaAutentificar::class . ':VerificarUsuario');
   
   $this->get('/{patente}', \operacionApi::class . ':OperacionesVehiculo')->add(\MWparaAutentificar::class . ':VerificarUsuario');
@@ -75,6 +75,23 @@ $app->group('/vehiculo', function () {
   $this->post('/sacar', \operacionApi::class . ':SacarUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
   
   //Administradores
+  $this->delete('/', \operacionApi::class . ':BorrarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');
+  
+  $this->put('/', \operacionApi::class . ':ModificarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');
+});
+
+/*Operaciones*/
+$app->group('/operaciones', function () {
+
+  //Usuarios Logueados
+  
+  //Administradores
+  $this->get('/', \operacionApi::class . ':TraerTodos')->add(\MWparaAutentificar::class . ':VerificarUsuario');
+  
+  $this->get('/{id_empleado}', \operacionApi::class . ':OperacionesEmpleado')->add(\MWparaAutentificar::class . ':VerificarUsuario');
+  
+  $this->post('/por_fecha', \operacionApi::class . ':CargarUno')->add(\MWparaAutentificar::class . ':VerificarUsuario');
+  
   $this->delete('/', \operacionApi::class . ':BorrarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');
   
   $this->put('/', \operacionApi::class . ':ModificarUno')->add(\MWparaAutentificar::class . ':VerificarAdmin');

@@ -59,5 +59,12 @@ class Cochera
 		$cocheraBuscado= $consulta->fetchObject('cochera');
 		return $cocheraBuscado;
     }
+
+    public static function CocherasMasUsadas(){
+		$objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+		$consulta =$objetoAccesoDato->RetornarConsulta("SELECT * FROM cocheras");
+		$consulta->execute();			
+		return $consulta->fetchAll(PDO::FETCH_CLASS, "cochera");
+    }
 }
 ?>
